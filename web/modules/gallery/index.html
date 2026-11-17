@@ -90,7 +90,9 @@ button{font-family:inherit}
   position:absolute;left:var(--lead);bottom:4.6vh;
   display:flex;align-items:center;gap:13px;
   font-size:12.5px;letter-spacing:.16em;color:rgba(236,230,218,.56);
+  transition:opacity .5s ease;
 }
+body.stageing .cue{opacity:0;pointer-events:none}
 .cue svg{width:11px;height:26px;overflow:visible;opacity:.7}
 .cue svg path{stroke:currentColor;stroke-width:1;fill:none}
 .cue svg path.head{stroke:var(--cobalt-lit);animation:drop 2.8s cubic-bezier(.4,0,.2,1) infinite}
@@ -1199,7 +1201,8 @@ const CAM=[
 let pRaw=0,pS=0,curIdx=-1,spin=0,spinSpeed=0,centred=0,holding=false;
 let yaw=0,yawTarget=0,pointerMode=null,dragX=0,touchPaint=false;
 let vh=0,trackTop=0,trackSpan=1,craftTop=1e9,lastT=0,clock=0;
-let lastHud='',tempShown=20,geomKey='';
+let lastHud='',tempShown=20,geomKey='',heroFade=-1;
+const heroEl=document.getElementById('hero');
 
 const C_IN_RAW=new THREE.Color(0xdcd3bd);
 const C_IN_FIRED=new THREE.Color(0xf8f4ea);
@@ -1317,8 +1320,14 @@ function updateUI(idx,loc,sh){
   const holdOK=(idx===0)&&!TOUCH;
   if(holdOK!==canvasEl.classList.contains('holding')) canvasEl.classList.toggle('holding',holdOK);
 
-  const uiOn=(window.scrollY>trackTop-vh*0.14)&&(window.scrollY<trackTop+trackSpan+vh*0.05);
-  if(uiOn!==stageui.classList.contains('on')) stageui.classList.toggle('on',uiOn);
+  const uiOn=(window.scrollY>trackTop-vh*0.55)&&(window.scrollY<trackTop+trackSpan+vh*0.05);
+  if(uiOn!==stageui.classList.contains('on')){
+    stageui.classList.toggle('on',uiOn);
+    document.body.classList.toggle('stageing',uiOn);
+  }
+  /* 首屏文字随舞台点亮一起退场，避免两段文字撞在一起 */
+  const hf=clamp((window.scrollY-(trackTop-vh*0.62))/(vh*0.11),0,1);
+  if(hf!==heroFade){heroFade=hf;heroEl.style.opacity=(1-hf).toFixed(3);}
 }
 
 function tick(now){

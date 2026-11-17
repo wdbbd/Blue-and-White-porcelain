@@ -27,6 +27,7 @@ _tmp_extract/
 _work/
 *.tmp
 *.bak
+*.bak-*
 
 # --- 编辑器 / IDE ---
 .idea/

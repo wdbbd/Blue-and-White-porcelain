@@ -6,16 +6,16 @@
    ============================================================ */
 
 window.SITE = {
-  name: '青瓷白',
+  name: '青花·一线',
   sub: 'Blue & White',
   tagline: '千年青花·一页之间',
 
   // 导航栏：每位负责人只改自己那一条的 owner 字段即可
   nav: [
-    { id: 'home',     text: '首页',   en: 'Home',     owner: '成员 A（首页+展厅）', href: '../index.html',                depth: 1 },
-    { id: 'timeline', text: '长廊',   en: 'Timeline', owner: '成员 B（长廊）',     href: '../modules/timeline/immersive/walk/index.html', depth: 2 },
-    { id: 'gallery',  text: '制瓷',   en: 'Craft',    owner: '成员 A（首页+展厅）', href: '../modules/gallery/index.html',  depth: 2 },
+    { id: 'home',     text: '首页',   en: 'Home',     owner: '成员 A（首页+制瓷）', href: '../index.html',                depth: 1 },
+    { id: 'gallery',  text: '制瓷',   en: 'Craft',    owner: '成员 A（首页+制瓷）', href: '../modules/gallery/index.html',  depth: 2 },
     { id: 'ai',       text: 'AI制作', en: 'AI Studio', owner: '成员 A（AI 生图）',  href: '../modules/ai/index.html',      depth: 2 },
+    { id: 'timeline', text: '长廊',   en: 'Timeline', owner: '成员 B（长廊）',     href: '../modules/timeline/immersive/walk/index.html', depth: 2 },
     { id: 'library',  text: '资料库', en: 'Library',  owner: '成员 C（资料库）',   href: '../modules/library/index.html',  depth: 2 },
   ],
 

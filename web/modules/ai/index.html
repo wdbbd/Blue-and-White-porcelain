@@ -3,128 +3,539 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AI 生图 · 青瓷白</title>
-<meta name="description" content="青花瓷 AI 生图工坊：选择缠枝牡丹、云龙、海水江崖等青花样式，写下你的意象，生成一只独一无二的青花圆盘。">
+<title>青花 AI 制作工坊 · 青瓷白</title>
+<meta name="description" content="青花 AI 制作工坊：在三维拉坯台上选择朝代与器型，拖动参数塑造器形，叠上馆藏青花纹样，一键生成青花成品。">
 <link rel="stylesheet" href="../../assets/css/tokens.css">
 <link rel="stylesheet" href="../../assets/css/base.css">
 <link rel="stylesheet" href="../../assets/css/nav.css">
-<link rel="stylesheet" href="ai.css?v=20261114a">
+<link rel="stylesheet" href="ai.css?v=20261123c">
+  <link rel="stylesheet" href="../../assets/css/assistant.css">
 </head>
 <body class="ai-page" data-page="ai">
 
-<section class="ai-hero">
-  <div class="ai-wrap">
-    <span class="seal-mark">AI 生图 · 生成式青花</span>
-    <h1>把心里的青花，烧出来</h1>
-    <em>Blue &amp; White Generative Studio</em>
-    <p class="lead">
-      左边选一种青花纹样，它会成为圆盘的缠枝边饰；右边写下你想要的画面——
-      龙、海、月、莲、山水、花鸟，AI 会为你题名、写诗，并生成一只真正的青花圆盘。
-    </p>
-    <div class="ai-badges">
-      <span><b>一</b> 选纹样</span>
-      <span><b>二</b> 写意象</span>
-      <span><b>三</b> AI 真图出青花</span>
-      <span>每次生成都有独立 seed，可保存原图</span>
-    </div>
-  </div>
-</section>
+<div class="ai-app" id="app">
 
-<main class="ai-wrap ai-work">
-  <!-- 左：样式 -->
-  <aside class="style-panel">
-    <div class="panel-head">
-      <span class="panel-no">一</span>
-      <div>
-        <h2>选一种青花样式</h2>
-        <p>边饰取自站内真实纹样。点一张，它会成为这次生成的边饰；写下意象后一起交给 AI。</p>
+  <!-- ============ 顶部：标题 + 朝代切换 ============ -->
+  <header class="app-head">
+    <div class="app-brand">
+      <span class="app-seal" aria-hidden="true">青</span>
+      <div class="app-title">
+        <h1>青花 AI 制作工坊</h1>
+        <em>BLUE &amp; WHITE · AI CERAMIC ATELIER</em>
       </div>
     </div>
-    <div class="style-grid" id="styleGrid" role="group" aria-label="青花样式"></div>
-    <div class="style-note">
-      所选纹样会环绕盘沿铺开，并决定这只盘的色感；中间的主纹则由你写下的意象决定。
-      同一组「纹样 + 意象 + seed」可以复现同一只盘。
+
+    <nav class="era-tabs" id="eraTabs" role="tablist" aria-label="选择朝代"></nav>
+
+    <div class="app-meta">
+      <span class="meta-state" id="statePill" data-level="0">湿坯</span>
+      <button class="link-btn meta-works" id="worksTopBtn" data-flow="1" type="button" title="查看我的作品集（每个档案独立、互不可见）">作品集</button>
+      <button class="link-btn meta-reset" id="resetBtn" type="button" title="重置整个流程：清空进度、烧制计数与贴图缓存">重置</button>
+    </div>
+  </header>
+
+  <!-- ═══ 新增：国风工序进度条（五阶解锁流程控制） ═══
+       步骤按钮由 ai.js 的 Flow 控制器动态生成：
+       择朝塑坯 → 精调形制 → 施纹绘彩 → 入窑烧制 → 鉴评归档 -->
+  <nav class="flow-bar" id="flowBar" aria-label="制作工序进度"></nav>
+
+  <!-- ============ 左：朝代推荐器型（视图①② 显示；含工序① 智能推荐） ============ -->
+  <aside class="pane pane-left" aria-label="器型库">
+    <div class="pane-head"><span>器型</span><em>FORM</em></div>
+    <p class="era-note" id="eraNote">饱满圆润 · 雍容大气</p>
+    <div class="shape-list" id="shapeList"></div>
+    <!-- 工序① 智能推荐：AI 按朝代起坯 -->
+    <button class="shape-ai-btn" id="aiShapeBtn" data-flow="1" type="button" title="按朝代推荐代表器型与初始参数；可反复点击，每次换一件候选器型">✦ AI 智能推荐器型</button>
+    <div class="pane-foot">点击器型 · 载入旋转放样模型</div>
+  </aside>
+
+  <!-- ============ 中：拉坯台 + 3D 器物 ============ -->
+  <section class="stage" id="stage">
+
+    <!-- 工坊背景（失焦） -->
+    <div class="stage-scene" aria-hidden="true">
+      <svg viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice">
+        <defs>
+          <linearGradient id="bgWall" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#1e1712"/>
+            <stop offset=".52" stop-color="#2b2119"/>
+            <stop offset="1" stop-color="#130e0a"/>
+          </linearGradient>
+          <linearGradient id="bgFloor" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#2c2219"/>
+            <stop offset="1" stop-color="#0d0906"/>
+          </linearGradient>
+          <radialGradient id="bgLamp" cx="50%" cy="36%" r="55%">
+            <stop offset="0" stop-color="#ffd7a6" stop-opacity=".30"/>
+            <stop offset=".45" stop-color="#d99a5e" stop-opacity=".11"/>
+            <stop offset="1" stop-color="#d99a5e" stop-opacity="0"/>
+          </radialGradient>
+          <radialGradient id="bgLamp2" cx="50%" cy="50%" r="50%">
+            <stop offset="0" stop-color="#ffd9a6" stop-opacity=".55"/>
+            <stop offset="1" stop-color="#ffd9a6" stop-opacity="0"/>
+          </radialGradient>
+          <filter id="b8"><feGaussianBlur stdDeviation="8"/></filter>
+          <filter id="b16"><feGaussianBlur stdDeviation="16"/></filter>
+          <filter id="b3"><feGaussianBlur stdDeviation="3"/></filter>
+        </defs>
+
+        <rect width="1600" height="1000" fill="url(#bgWall)"/>
+        <rect y="690" width="1600" height="310" fill="url(#bgFloor)"/>
+        <ellipse cx="800" cy="340" rx="860" ry="640" fill="url(#bgLamp)"/>
+
+        <!-- 后墙：木格窗 -->
+        <g filter="url(#b16)" opacity=".55">
+          <rect x="560" y="90" width="500" height="520" fill="#3b2c1f" opacity=".38"/>
+          <g stroke="#6d5335" stroke-width="7" opacity=".55">
+            <path d="M610 90v520M810 90v520M1010 90v520M560 210h500M560 380h500M560 545h500"/>
+          </g>
+        </g>
+
+        <!-- 左：青花展架 -->
+        <g filter="url(#b8)" opacity=".78">
+          <rect x="48" y="236" width="410" height="15" rx="4" fill="#4b3523"/>
+          <rect x="48" y="430" width="410" height="15" rx="4" fill="#4b3523"/>
+          <rect x="70" y="250" width="12" height="470" fill="#3a2a1c"/>
+          <rect x="424" y="250" width="12" height="470" fill="#3a2a1c"/>
+          <!-- 架上器物 -->
+          <path d="M110 236c-2-28 6-40 22-40s24 12 22 40z" fill="#93a5ad" opacity=".62"/>
+          <path d="M160 236c-8-10-10-52 4-62 8-6 24-4 30 6 8 14 8 46 0 56z" fill="#8b9ea8" opacity=".55"/>
+          <path d="M228 236c0-12 6-22 18-22s18 10 18 22z" fill="#7f939d" opacity=".5"/>
+          <path d="M286 236c-10-6-16-38-4-52 8-10 30-10 38 0 12 14 6 46-4 52z" fill="#96a8b0" opacity=".6"/>
+          <path d="M350 236c-6-30 2-58 18-58s24 28 18 58z" fill="#889ba5" opacity=".52"/>
+          <path d="M392 236h34v-30h-34z" fill="#7b8f99" opacity=".5"/>
+          <g fill="#3f678f" opacity=".45">
+            <path d="M108 210h48v7h-48z"/>
+            <path d="M158 208h44v8h-44z"/>
+            <path d="M286 200h44v8h-44z"/>
+          </g>
+
+          <rect x="48" y="430" width="410" height="15" rx="4" fill="#4b3523"/>
+          <path d="M96 430c-4-34 6-56 26-56s30 22 26 56z" fill="#93a5ad" opacity=".5"/>
+          <path d="M176 430c-8-8-12-42 0-52 10-8 26-6 32 4 8 12 4 40-4 48z" fill="#84979f" opacity=".5"/>
+          <path d="M258 430c0-10 4-18 14-18s14 8 14 18z" fill="#7f939d" opacity=".45"/>
+          <path d="M312 430c-6-24 0-44 14-44s20 20 14 44z" fill="#8fa2aa" opacity=".5"/>
+        </g>
+
+        <!-- 右：陶坯台 -->
+        <g filter="url(#b8)" opacity=".8">
+          <rect x="1130" y="300" width="360" height="14" rx="4" fill="#4b3523"/>
+          <rect x="1130" y="470" width="360" height="14" rx="4" fill="#4b3523"/>
+          <rect x="1150" y="314" width="10" height="120" fill="#3a2a1c"/>
+          <rect x="1460" y="314" width="10" height="120" fill="#3a2a1c"/>
+          <path d="M1180 300c-6-30 0-54 16-54s22 24 16 54z" fill="#96a8b0" opacity=".52"/>
+          <path d="M1240 300c-10-8-14-36-2-46 10-8 26-6 32 4 8 12 4 34-4 42z" fill="#889ba5" opacity=".55"/>
+          <path d="M1306 300c0-8 4-14 12-14s12 6 12 14z" fill="#7b8f99" opacity=".5"/>
+          <path d="M1350 300c-4-26 2-48 16-48s20 22 16 48z" fill="#93a5ad" opacity=".55"/>
+          <path d="M1408 300h38v-26h-38z" fill="#7f939d" opacity=".45"/>
+          <!-- 素坯 -->
+          <path d="M1170 470c-8-20-8-52 4-64 10-10 34-10 44 0 12 12 12 44 4 64z" fill="#c8b299" opacity=".5"/>
+          <path d="M1246 470c-4-16 0-38 12-44s22 4 22 16-4 24-10 28z" fill="#bda98f" opacity=".45"/>
+          <path d="M1320 470c-6-24 0-50 16-50s22 26 16 50z" fill="#c8b299" opacity=".48"/>
+          <path d="M1392 470h40v-34h-40z" fill="#b9a68c" opacity=".45"/>
+        </g>
+
+        <!-- 屏风（右侧远景） -->
+        <g filter="url(#b16)" opacity=".35">
+          <rect x="1010" y="180" width="330" height="380" fill="#4a3927"/>
+          <rect x="1030" y="200" width="290" height="340" fill="#2f3f47"/>
+          <path d="M1050 470c40-90 70-120 110-96s70 40 110-30v166h-220z" fill="#59707a" opacity=".5"/>
+        </g>
+
+        <!-- 木凳（左下） -->
+        <g filter="url(#b3)" opacity=".82">
+          <rect x="196" y="742" width="200" height="16" rx="5" fill="#5b412a"/>
+          <rect x="208" y="758" width="14" height="96" fill="#4a3320"/>
+          <rect x="370" y="758" width="14" height="96" fill="#4a3320"/>
+          <rect x="220" y="806" width="152" height="10" fill="#4a3320" opacity=".8"/>
+        </g>
+
+        <!-- 地面陶罐 + 陶屑 -->
+        <g filter="url(#b3)" opacity=".78">
+          <path d="M1246 830c-24-30-24-78-2-96 22-16 60-16 82 0 22 18 22 66-2 96z" fill="#7e8f97" opacity=".5"/>
+          <path d="M1258 724c0-12 8-20 28-20s28 8 28 20z" fill="#8b9ea6" opacity=".45"/>
+          <ellipse cx="1060" cy="866" rx="46" ry="12" fill="#4a3726" opacity=".55"/>
+          <ellipse cx="1140" cy="884" rx="30" ry="8" fill="#3f2f21" opacity=".5"/>
+          <ellipse cx="420" cy="878" rx="38" ry="9" fill="#43301f" opacity=".45"/>
+        </g>
+
+        <!-- 吊灯暖光 -->
+        <g opacity=".9">
+          <ellipse cx="330" cy="118" rx="46" ry="18" fill="#e8c48c" opacity=".5" filter="url(#b3)"/>
+          <ellipse cx="330" cy="190" rx="96" ry="88" fill="url(#bgLamp2)" opacity=".3"/>
+          <path d="M330 0v70" stroke="#4a3a28" stroke-width="3" opacity=".7"/>
+        </g>
+      </svg>
+    </div>
+
+    <!-- Three.js 画布 -->
+    <canvas id="scene" aria-label="三维拉坯台：拖动器身可捏塑，滚轮缩放，右键拖动旋转视角"></canvas>
+
+    <!-- 舞台信息 -->
+    <div class="stage-hud" aria-hidden="true">
+      <div class="hud-pill">
+        <b id="hudShape">元青花大罐</b><i></i><span id="hudPattern">素胎</span>
+      </div>
+      <div class="hud-pill">
+        <span class="hud-dot" id="hudDot"></span><span id="hudState">湿坯待塑</span>
+      </div>
+    </div>
+
+    <!-- 操作模式注释（仅视图① 显示，与模式按键配套） -->
+    <aside class="mode-guide" id="modeGuide" data-flow="1" aria-label="操作模式说明">
+      <div class="mg-head">操作指引</div>
+      <div class="mg-row" data-mode="pinch"><b>捏塑</b><span>长按鼠标左右</span></div>
+      <div class="mg-row" data-mode="stretch"><b>拉伸</b><span>长按鼠标上下</span></div>
+      <div class="mg-row" data-mode="orbit"><b>旋转观察</b><span>放大 缩小 360°旋转</span></div>
+      <div class="mg-row" data-mode="flatten"><b>压平</b><span>长按鼠标上下</span></div>
+    </aside>
+
+    <!-- 模式切换（仅视图① 择朝塑坯 显示） -->
+    <div class="mode-dock" id="modeDock" data-flow="1" role="group" aria-label="操作模式">
+      <button class="mode-btn on" data-mode="pinch" type="button"><i>捏</i><span>捏塑</span><em>PINCH</em></button>
+      <button class="mode-btn" data-mode="stretch" type="button"><i>拉</i><span>拉伸</span><em>STRETCH</em></button>
+      <button class="mode-btn" data-mode="orbit" type="button"><i>转</i><span>旋转观察</span><em>ORBIT</em></button>
+      <button class="mode-btn" data-mode="flatten" type="button"><i>压</i><span>压平</span><em>FLATTEN</em></button>
+    </div>
+
+    <!-- 工序① 智能推荐结果卡：AI 推荐先落在画面左下角（工序① 右栏不可见，结果不再石沉大海） -->
+    <div class="shape-rec" id="shapeRecCard" role="region" aria-live="polite" aria-label="AI 器型推荐结果" hidden>
+      <div class="sr-head">
+        <span class="sr-tag">✦ AI 器型推荐</span>
+        <span class="sr-hit" id="shapeRecHit"></span>
+        <button class="sr-close" id="shapeRecClose" type="button" aria-label="关闭推荐结果">×</button>
+      </div>
+      <div class="sr-name-row">
+        <b class="sr-name" id="shapeRecName">元青花大罐</b>
+        <span class="sr-en" id="shapeRecEn">JAR</span>
+      </div>
+      <p class="sr-spec" id="shapeRecSpec"></p>
+      <p class="sr-note" id="shapeRecNote"></p>
+      <p class="sr-skip" id="shapeRecSkip" hidden></p>
+      <p class="sr-risk" id="shapeRecRisk" hidden></p>
+      <div class="sr-acts">
+        <button class="sr-btn" id="shapeRecAgain" type="button">↻ 换一个器型</button>
+        <button class="sr-btn sr-go" id="shapeRecGo" type="button">定下此形 ›</button>
+      </div>
+    </div>
+
+    <div class="stage-tip" id="stageTip">左键拖动器身捏塑 · 滚轮缩放 · 右键拖动旋转</div>
+
+    <!-- 工序视图切换：上一步 / 下一步（流程控制器驱动可用态） -->
+    <div class="stage-nav" role="navigation" aria-label="工序切换">
+      <button class="sn-btn" id="flowPrev" type="button" title="返回上一道工序（回改上游会自动重置下游依赖）">‹ 上一步</button>
+      <button class="sn-btn sn-next" id="flowNext" type="button" title="前往下一道工序">下一步 ›</button>
+    </div>
+
+    <!-- 鼠标落点光圈 -->
+    <div class="cursor-ring" id="cursorRing" aria-hidden="true"></div>
+
+    <div class="stage-vignette" aria-hidden="true"></div>
+    <div class="stage-grain" aria-hidden="true"></div>
+
+    <!-- AI 适配检测提示条 -->
+    <div class="adapt-toast" id="adaptToast" hidden>
+      <div class="at-head">
+        <b id="atScore">62</b>
+        <span>适配检测</span>
+        <button class="at-close" id="atClose" type="button" aria-label="关闭">×</button>
+      </div>
+      <p id="atJudge"></p>
+      <div class="at-replace" id="atReplace" hidden>
+        <em>替换建议</em>
+        <div class="at-chips" id="atChips"></div>
+      </div>
+    </div>
+
+    <!-- 窑火氛围层（烧制时的暖光脉动） -->
+    <div class="kiln-glow" id="kilnGlow" aria-hidden="true"></div>
+
+    <!-- ═══ 新增模块 2：虚拟窑炉开窑仪式（卷帘揭纱） ═══ -->
+    <div class="kiln-overlay" id="kilnOverlay" hidden>
+      <div class="kl-scene">
+        <svg viewBox="0 0 800 620" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <defs>
+            <radialGradient id="klFireG" cx="50%" cy="78%" r="55%">
+              <stop offset="0" stop-color="#ffb35c" stop-opacity=".85"/>
+              <stop offset=".5" stop-color="#d96a2c" stop-opacity=".4"/>
+              <stop offset="1" stop-color="#d96a2c" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+          <rect width="800" height="620" fill="#120c07"/>
+          <path d="M180 520V300a220 190 0 0 1 440 0v220z" fill="#241812"/>
+          <path d="M215 520V310a185 158 0 0 1 370 0v210z" fill="#0d0805"/>
+          <path d="M255 520V330a145 120 0 0 1 290 0v190z" fill="url(#klFireG)"/>
+          <rect y="520" width="800" height="100" fill="#0a0603"/>
+        </svg>
+        <div class="kl-flames"><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="kl-smoke"><i></i><i></i><i></i></div>
+        <p class="kl-text" id="klText">窑火正旺 · 静候开窑…</p>
+      </div>
+      <div class="kl-curtain cl" id="klCurL"><span>青</span></div>
+      <div class="kl-curtain cr" id="klCurR"><span>花</span></div>
+      <div class="kl-badge" id="klBadge" hidden></div>
+    </div>
+
+    <!-- AI 终鉴评卡片 -->
+    <div class="appraise-card" id="appraiseCard" hidden>
+      <div class="ap-head">
+        <b id="apScore">90</b>
+        <div class="ap-title"><span id="apLabel">AI 终鉴评</span><em id="apMode">常规烧制</em></div>
+        <button class="ap-close" id="apClose" type="button" aria-label="关闭">×</button>
+      </div>
+      <p class="ap-con" id="apCon"></p>
+      <div class="ap-subs" id="apSubs"></div>
+      <ul class="ap-list hi" id="apHiL"></ul>
+      <ul class="ap-list de" id="apDeL"></ul>
+      <div class="ap-acts" id="apActs" hidden>
+        <button id="apBeauty" type="button">✨ 一键美化</button>
+        <button id="apUndoBeauty" type="button" hidden>取消美化</button>
+      </div>
+      <p class="ap-note" id="apNote" hidden></p>
+    </div>
+  </section>
+
+  <!-- ============ 右：器型参数（工序② 精调形制 起开放） ============ -->
+  <aside class="pane pane-right" aria-label="器型参数">
+    <div class="pane-head"><span>器型参数</span><em>PARAMETERS</em></div>
+    <div class="param-list" id="paramList" data-flow="2"></div>
+    <div class="param-foot" data-flow="2">
+      <span>高 <b id="mH">28.6</b> cm</span><i></i>
+      <span>腹径 <b id="mD">29.4</b> cm</span>
+      <button class="link-btn" id="resetParams" type="button">参数归位</button>
+    </div>
+
+    <!-- 器型智能辅助：AI 重塑（工序②）；智能推荐已移至左侧器型库（工序①） -->
+    <button class="ai-reshape-btn" id="aiReshapeBtn" data-flow="2" type="button" title="评估当前轮廓并做保留意图的柔和矫正">✦ AI 重塑</button>
+    <!-- 工序② 完成判定：用户确认形制后进入施纹绘彩 -->
+    <button class="flow-confirm" id="confirmShapeBtn" data-flow="2" type="button">✓ 确认形制 · 进入施纹</button>
+    <p class="ai-shape-note" id="aiShapeNote" hidden></p>
+
+    <!-- ═══ 时光演化滑杆（工序⑤ 入窑烧制 起开放） ═══ -->
+    <div class="evo-box" data-flow="5">
+      <div class="evo-head"><span>时光演化</span><em>TIME EVOLVE</em>
+        <label class="evo-lock"><input type="checkbox" id="evoLock">锁定造型</label>
+      </div>
+      <input type="range" id="evoRange" class="evo-range" min="0" max="3" step="1" value="0"
+             aria-label="时光演化：元 明 清 现代再创作">
+      <div class="evo-ticks"><span>元</span><span>明</span><span>清</span><span>现代</span></div>
+      <div class="evo-acts">
+        <button id="evoGo" type="button" title="把当前器物沿时光轴演化到目标年代">⏳ 时光演化</button>
+        <label class="evo-mode"><input type="checkbox" id="evoHeavy">重演化</label>
+        <button id="evoBack" type="button" disabled>回退</button>
+      </div>
+      <p class="evo-story" id="evoStory" hidden></p>
+    </div>
+
+    <!-- AI 重塑结果卡：评分 + 修改清单 + 应用/放弃（随工序② 开放） -->
+    <div class="ai-shape-card" id="aiShapeCard" data-flow="2" hidden>
+      <div class="asc-head">
+        <b id="ascScore">90</b>
+        <span>AI 造型评估</span>
+        <button class="asc-again" id="ascAgain" type="button" title="按当前器身重新评估一次（结果卡会盖住下方按钮，故在这里提供入口）">↻ 重评</button>
+        <button class="asc-close" id="ascClose" type="button" aria-label="关闭">×</button>
+      </div>
+      <p class="asc-focus" id="ascFocus"></p>
+      <p class="asc-sug" id="ascSug"></p>
+      <!-- 表面平整度计量：当前值 → 应用后预计值（AI 重塑的主效果） -->
+      <div class="asc-flat" id="ascFlat">
+        <span>表面平整度</span>
+        <b id="ascFlatNow">--</b>
+        <i class="asc-bar"><em id="ascFlatBar"></em></i>
+        <small id="ascFlatTo"></small>
+      </div>
+      <ul class="asc-list" id="ascList"></ul>
+      <label class="asc-free"><input type="checkbox" id="ascFree"> 自由创作模式（只查畸形，不强改朝代范式）</label>
+      <div class="asc-acts">
+        <button id="ascApply" type="button">应用修改</button>
+        <button id="ascReject" type="button">保持原样</button>
+      </div>
     </div>
   </aside>
 
-  <!-- 右：圆盘生成器 -->
-  <section class="gen-panel" aria-label="AI 青花圆盘生成器">
-    <div class="plate-stage" id="plateStage">
-      <div class="plate-glow" aria-hidden="true"></div>
-      <svg class="plate-orbit" viewBox="0 0 760 760" aria-hidden="true">
-        <defs>
-          <path id="orbitPath" d="M380,380 m-348,0 a348,348 0 1,1 696,0 a348,348 0 1,1 -696,0"/>
-        </defs>
-        <text><textPath href="#orbitPath" startOffset="0">青花 · AI 生图 · 一色千年 · GENERATIVE PORCELAIN · </textPath></text>
-      </svg>
+  <!-- ============ 下方：纹样 / 区域 / 操作 ============ -->
+  <div class="app-bottom">
 
-      <div class="plate">
-        <img id="plate" alt="AI 生成的青花圆盘" loading="eager">
-        <div class="plate-empty" id="plateEmpty">
-          <span class="pe-kicker">AI · 青花</span>
-          <p>选一种纹样，写下意象<br>生成一只真正的 AI 青花盘</p>
+    <!-- 纹样库（工序③ 施纹绘彩 开放） -->
+    <section class="bot-block bot-pattern" data-flow="3" aria-label="纹样库">
+      <div class="pane-head">
+        <span>纹样库</span><em>PATTERN</em><b id="patternEra">唐代</b>
+        <button class="ai-rec-btn" id="aiRecBtn" type="button" title="根据当前朝代·器型·区域智能推荐">✦ AI 推荐</button>
+      </div>
+      <div class="pattern-list" id="patternList"></div>
+      <div class="pat-extra">
+        <button class="btn-ghost pat-random" id="randomBtn" data-flow="3" type="button" title="随机搭配器型与纹样">🎲 随机搭配</button>
+      </div>
+
+      <!-- AI 推荐面板（朝代限定 / AI 创作） -->
+      <div class="ai-panel" id="aiPanel" hidden>
+        <div class="ai-panel-head">
+          <div class="ai-tabs" id="aiTabs" role="tablist">
+            <button class="ai-tab on" data-mode="dynasty" type="button">朝代限定</button>
+            <button class="ai-tab" data-mode="free" type="button">AI 创作</button>
+          </div>
+          <button class="ai-close" id="aiClose" type="button" aria-label="关闭">×</button>
         </div>
-        <div class="plate-gloss" aria-hidden="true"></div>
-        <div class="plate-loading" id="plateLoading" hidden>
-          <div class="load-ring" aria-hidden="true"></div>
-          <div class="load-t" id="loadText">研墨 · 调钴料</div>
-          <div class="load-p"><i id="loadBar"></i></div>
-          <div class="load-s" id="loadSub">AI 正在把文字译成青花</div>
+        <p class="ai-panel-sub" id="aiPanelSub">根据当前 朝代 · 器型 · 区域 计算</p>
+        <div class="ai-rec-list" id="aiRecList"></div>
+
+        <!-- AI 纹样创作：描述（诗句 / 关键词）→ AI 设计 → UV 贴图 -->
+        <div class="ai-gen" id="aiGenBox" hidden>
+          <label class="gen-label" id="genLabel" for="genTheme">纹样描述（诗句 / 关键词）</label>
+          <textarea class="gen-input gen-theme-input" id="genTheme" rows="2" maxlength="40"
+                    placeholder="如：春江潮水连海平 / 缠枝莲 / 双龙戏珠 / 云鹤…"></textarea>
+
+          <!-- AI 创作：只给“笔意”这类风格倾向，不提供现成纹样选项 -->
+          <div class="gen-row gen-style-row" id="genStyleRow" hidden>
+            <label class="gen-label">笔意</label>
+            <div class="gen-chips" id="genStyleChips" role="group" aria-label="笔意">
+              <button type="button" data-style="xieyi" class="on">写意</button>
+              <button type="button" data-style="gongbi">工笔</button>
+              <button type="button" data-style="pomo">泼墨</button>
+            </div>
+          </div>
+
+          <div class="gen-row">
+            <label class="gen-label" for="genLayout">布局</label>
+            <select class="gen-select" id="genLayout">
+              <option value="auto">自动（按区域）</option>
+              <option value="loop">环形平铺</option>
+              <option value="medallion">团花居中</option>
+              <option value="band">窄幅边饰</option>
+            </select>
+            <button class="gen-btn" id="genBtn" type="button">生成纹样</button>
+          </div>
+          <p class="gen-error" id="genErr" hidden></p>
+          <div class="gen-out" id="genOut" hidden>
+            <img class="gen-prev" id="genPrev" alt="生成的 UV 纹样预览">
+            <p class="gen-desc" id="genDesc"></p>
+            <p class="gen-risk" id="genRisk" hidden></p>
+            <div class="gen-acts">
+              <button class="gen-apply" id="genApply" type="button">应用到器物</button>
+              <button class="gen-redraw" id="genRedraw" type="button">重绘校正</button>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+    </section>
 
-    <div class="plate-caption" aria-live="polite">
-      <div class="cap-title" id="capTitle"></div>
-      <div class="cap-line" id="capLine"></div>
-      <div class="cap-meta" id="capMeta"></div>
-    </div>
+    <!-- 纹饰区域 / 密度 / 色调（工序③ 开放） -->
+    <section class="bot-block bot-region" data-flow="3" aria-label="纹饰设置">
+      <div class="pane-head"><span>纹饰区域</span><em>REGION</em></div>
+      <div class="region-row" id="regionList"></div>
+      <div class="mix-row">
+        <span class="mix-label">密度</span>
+        <div class="seg" id="densityList"></div>
+      </div>
+      <div class="mix-row">
+        <span class="mix-label">青花</span>
+        <div class="tone-list" id="toneList"></div>
+      </div>
+    </section>
 
-    <div class="prompt-card">
-      <div class="prompt-head">
-        <span class="panel-no">二</span>
-        <label for="prompt">写下你想要的画面</label>
-        <span class="style-now" id="styleNow">缠枝牡丹</span>
+    <!-- AI 烧制：工艺参数 + 窑火 + 迭代（工序⑤ 入窑烧制 开放） -->
+    <section class="bot-block bot-fire" data-flow="5" aria-label="AI 烧制">
+      <div class="pane-head"><span>AI 烧制</span><em>KILN</em><b class="fire-count" id="fireCount">第 1 烉</b></div>
+      <div class="fire-sliders">
+        <div class="f-row"><span class="f-label">胎质</span><input type="range" id="fireClay" min="0" max="100" value="60"><b id="fireClayV">中胎</b></div>
+        <div class="f-row"><span class="f-label">料浓</span><input type="range" id="firePig" min="0" max="100" value="55"><b id="firePigV">55</b></div>
+        <div class="f-row"><span class="f-label">温度</span><input type="range" id="fireTemp" min="950" max="1380" step="5" value="1250"><b id="fireTempV">1250℃</b></div>
       </div>
-      <div class="prompt-row">
-        <input id="prompt" type="text" maxlength="60" autocomplete="off"
-               placeholder="比如：月下青花，一枝梅影 / 海上云龙 / 一池莲花">
-        <button class="gen-btn" id="genBtn" type="button">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19c4-9 9-13 16-15-2 7-6 12-15 16"/><path d="M4 19c3-2 6-3 9-3"/></svg>
-          <span>生成</span>
-        </button>
+      <div class="fire-acts">
+        <button class="fire-btn" id="fireBtn" type="button"><span>🔥 窑火升焰</span></button>
+        <div class="fire-act-row">
+          <button class="fire-sub" id="fireUndo" type="button" disabled>撤回上一窑</button>
+          <button class="fire-sub" id="fireReset" type="button" disabled>重置烧制</button>
+        </div>
+        <label class="fire-skip"><input type="checkbox" id="fireSkip">跳过开窑仪式</label>
       </div>
-      <div class="chips" id="chips"></div>
-      <div class="prompt-foot">
-        <span class="stat" id="status">选好纹样，写下意象，点「生成」。</span>
-        <div class="acts">
-          <button id="shuffle" type="button">换一个</button>
-          <button id="dl2" type="button">保存原图</button>
+    </section>
+
+    <!-- 操作 + 成品预览（仅视图⑥ 鉴评归档 显示；重置已移至顶栏） -->
+    <section class="bot-block bot-act" data-flow="6" aria-label="操作">
+      <div class="pane-head"><span>操作</span><em>ACTION</em></div>
+      <div class="act-btns">
+        <button class="btn-main" id="makeBtn" type="button"><span>生成青花成品</span></button>
+        <button id="againBtn" type="button" title="清空当前作品，回到第一阶段重新起坯做下一件">＋ 再做一个</button>
+      </div>
+      <div class="pv" id="pv" data-flow="6">
+        <div class="pv-thumb" id="pvThumb"><span>尚未出窑</span></div>
+        <div class="pv-info">
+          <b id="pvTitle">待烧制</b>
+          <span id="pvSub">选纹样 · 生成成品</span>
+          <span class="pv-tags" id="pvTags" hidden></span>
+          <a class="pv-dl" id="pvDl" download hidden>保存作品 · 3D 模型</a>
         </div>
       </div>
-    </div>
-  </section>
-</main>
+    </section>
 
-<section class="ai-steps">
-  <div class="wrap">
-    <div class="ai-step">
-      <span class="n">壹</span>
-      <div><h4>边饰来自馆藏</h4><p>盘沿的缠枝、龙鳞、浪头不是随手画的线条，而是从馆藏纹样里提取的边饰描述，交给图像模型重新生成。</p></div>
-    </div>
-    <div class="ai-step">
-      <span class="n">贰</span>
-      <div><h4>文字变成画面</h4><p>「月下」会点亮一轮月，「海上云龙」会让龙身翻出云气；你写的意象会成为圆盘的中心画面。</p></div>
-    </div>
-    <div class="ai-step">
-      <span class="n">叁</span>
-      <div><h4>AI 真图，落款成瓷</h4><p>图像模型生成圆盘，DeepSeek 起四字题名、写一句诗；接口未连接时保留本地题名，图像仍由 AI 生成。</p></div>
-    </div>
   </div>
-</section>
+</div>
 
-<script src="../../assets/data/site.config.js?v=20261116"></script>
-<script src="../../assets/js/site.js?v=20261116"></script>
-<script src="ai.js"></script>
+<!-- 作品集弹窗：每个本机档案独立保存；有口令的档案需解锁；点击「打开」可在 3D 舞台还原 -->
+<div class="works-modal" id="worksModal" hidden>
+  <div class="wm-card" role="dialog" aria-label="作品集">
+    <div class="wm-head"><span>作品集</span><em>MY COLLECTION</em><button id="wmClose" type="button" aria-label="关闭">×</button></div>
+    <div class="wm-user">
+      <span>当前档案</span><b id="wmUserName">本机访客</b>
+      <button id="wmSwitchUser" type="button">切换 / 新建</button>
+    </div>
+
+    <!-- 档案面板：本机档案列表 / 解锁 / 新建 -->
+    <div class="wm-auth" id="wmAuth" hidden>
+      <div class="wm-auth-head">
+        <b>本机档案</b>
+        <span>每个档案一份作品集，互不可见；设了口令的档案需口令解锁</span>
+        <button id="wmAuthClose" type="button" aria-label="关闭档案面板">×</button>
+      </div>
+      <div class="wm-auth-list" id="wmAuthList"></div>
+      <div class="wm-unlock" id="wmUnlock" hidden>
+        <input id="wmUnlockPass" type="password" maxlength="20" placeholder="输入该档案的口令">
+        <button id="wmUnlockOk" type="button">解锁并进入</button>
+        <p class="wm-auth-note" id="wmUnlockNote"></p>
+      </div>
+      <div class="wm-auth-form" id="wmAuthForm" hidden>
+        <input id="wmAuthName" maxlength="12" placeholder="档案名（如：小明）">
+        <input id="wmAuthPass" type="password" maxlength="20" placeholder="口令（至少 4 位；留空 = 不设口令）">
+        <input id="wmAuthPass2" type="password" maxlength="20" placeholder="再输一次口令">
+        <div class="wm-auth-acts">
+          <button id="wmAuthOk" type="button">创建并进入</button>
+          <button id="wmAuthCancel" type="button">取消</button>
+        </div>
+        <p class="wm-auth-note" id="wmAuthNote"></p>
+      </div>
+      <button class="wm-auth-new" id="wmNewUser" type="button">＋ 新建档案</button>
+    </div>
+
+    <div class="wm-list" id="wmList"></div>
+  </div>
+</div>
+
+<script>
+/* 全局错误提示：任何脚本报错都在页面顶部弹红条，便于现场快速定位（资源加载失败不提示） */
+window.addEventListener('error', function (e) {
+  if (!e.message) return;
+  var t = document.getElementById('jsErrToast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'jsErrToast';
+    t.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;background:#8c2f2f;color:#ffe9e9;font:13px/1.6 sans-serif;padding:8px 14px;text-align:center;';
+    (document.body || document.documentElement).appendChild(t);
+  }
+  t.textContent = '⚠ 脚本错误：' + e.message + '（' + (e.filename || '').split('/').pop() + ':' + e.lineno + '）—— 请改用「启动工坊.bat」打开';
+});
+</script>
+<script src="../../assets/data/site.config.js"></script>
+<script src="../../assets/js/site.js"></script>
+<script src="../../assets/js/vendor/three.min.js"></script>
+<!-- 纹样内嵌库（base64 data-URI）：file:// 双击直开也能把真实纹样贴上器身 -->
+<script src="../../assets/data/pattern-embed.js?v=20261120a"></script>
+<script src="ai-advisor.js?v=20261118b"></script>
+<script src="ai-texture.js?v=20261123e"></script>
+<script src="ai-shape.js?v=20261122g"></script>
+<script src="ai-fire.js?v=20261121z"></script>
+<script src="ai-ritual.js?v=20261121r"></script>
+<script src="ai.js?v=20261124b"></script>
+<script src="../../assets/js/assistant.js"></script>
 </body>
 </html>

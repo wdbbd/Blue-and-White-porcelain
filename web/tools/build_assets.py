@@ -7,16 +7,13 @@
 import os, re, json, sys, unicodedata
 from PIL import Image
 
-SRC = r"D:\Blue and White porcelain\_work\青花瓷资料收集"
-SRC2 = r"D:\Blue and White porcelain\_work\传承人故事文章与照片"
+SRC = r"D:\Blue and White porcelain\_tmp_extract\青花瓷资料收集"
+SRC2 = r"D:\Blue and White porcelain\_tmp_extract2\传承人故事文章与照片"
 OUT = r"D:\Blue and White porcelain\web\assets"
 
 MAX_FULL = 1400
 MAX_THUMB = 520
 Q = 82
-
-if not os.path.isdir(SRC):
-    sys.exit('源目录不存在：\n  %s\n请先把「资料素材\\青花瓷资料收集 (2).zip」解压到 _work\\青花瓷资料收集，\n或修改本文件顶部的 SRC / SRC2。' % SRC)
 
 def slug(s):
     """中文 → 安全的 ASCII 片段（保留英文数字，其余转拼音首字母不可得则用 hash）"""
@@ -117,6 +114,15 @@ out_json = os.path.join(OUT, 'data', 'manifest.json')
 os.makedirs(os.path.dirname(out_json), exist_ok=True)
 with open(out_json, 'w', encoding='utf-8') as f:
     json.dump(manifest, f, ensure_ascii=False, indent=1)
+
+# 同一份清单再写一个 JS 版本：双击 index.html（file://）时 fetch 会被浏览器拦截，
+# 资料库会退回 window.LIB_MANIFEST，所以两份必须一起更新。
+out_js = os.path.join(OUT, 'data', 'manifest.js')
+with open(out_js, 'w', encoding='utf-8') as f:
+    f.write('/* 自动生成，勿手改；内容与 manifest.json 一致，作为 file:// 直开时的数据兜底 */\n')
+    f.write('window.LIB_MANIFEST = ')
+    json.dump(manifest, f, ensure_ascii=False)
+    f.write(';\n')
 
 print('\n完成：')
 print('  纹样 %d 张 / 器型 %d 张 / 匠人 %d 位' % (

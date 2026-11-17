@@ -9,6 +9,7 @@
 <link rel="stylesheet" href="../../assets/css/base.css">
 <link rel="stylesheet" href="../../assets/css/nav.css">
 <link rel="stylesheet" href="library.css">
+  <link rel="stylesheet" href="../../assets/css/assistant.css">
 </head>
 <body data-page="library">
 
@@ -69,6 +70,7 @@
 <!-- 结果 -->
 <section class="results wrap" id="results" hidden>
   <div class="r-grid" id="rGrid"></div>
+  <nav class="pager" id="rPager" aria-label="检索结果分页"></nav>
   <div class="r-empty" id="rEmpty" hidden>
     <div class="e-t">没有找到相关资料</div>
     <p>试试更短的关键词，比如「梅瓶」「康熙」「缠枝莲」</p>
@@ -79,17 +81,19 @@
 <section class="all wrap" id="all">
   <div class="a-head reveal">
     <h2 class="h-sub">全部资料</h2>
-    <p class="lead">共 <b id="aCount">—</b> 条，按类别浏览。</p>
+    <p class="lead">共 <b id="aCount">—</b> 条，可用上方筛选按类别、朝代浏览。</p>
   </div>
   <div class="a-tabs" id="aTabs"></div>
   <div class="r-grid" id="aGrid"></div>
-  <div class="a-more"><button class="btn" id="aMore">加载更多</button></div>
+  <nav class="pager" id="aPager" aria-label="资料分页"></nav>
 </section>
 
-<script src="../../assets/data/site.config.js?v=20261116"></script>
+<script src="../../assets/data/site.config.js"></script>
 <script src="../../assets/data/masters.js"></script>
-<script src="../../assets/js/site.js?v=20261116"></script>
+<script src="../../assets/data/manifest.js"></script>
+<script src="../../assets/js/site.js"></script>
 <script src="ai.js"></script>
 <script src="library.js"></script>
+<script src="../../assets/js/assistant.js"></script>
 </body>
 </html>

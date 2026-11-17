@@ -10,6 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/tokens.css">
 <link rel="preload" as="image" href="assets/img/hall/01-wanli.webp" fetchpriority="high">
 <script>try{if(!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.classList.add('motion-ok')}catch(e){}</script>
 <style>
@@ -47,20 +48,21 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .skip{position:fixed;left:16px;top:-64px;z-index:300;background:#fff;color:var(--night);padding:10px 18px}
 .skip:focus{top:0}
 
-/* ---------- 顶栏 ---------- */
+/* ---------- 顶栏（统一为制瓷页样式：深色渐变 + 宋体 + 米白文字） ---------- */
 .topbar{position:fixed;left:0;right:0;top:0;height:var(--nav-h);z-index:120;display:flex;align-items:center;
-  justify-content:space-between;padding:0 clamp(18px,4vw,54px);border-bottom:1px solid var(--line);
-  background:linear-gradient(to bottom,rgba(7,26,51,.86),rgba(7,26,51,.42));backdrop-filter:blur(10px)}
-.topbar .brand{display:flex;align-items:center;gap:12px;font-size:16px;letter-spacing:.34em;font-weight:600}
-.topbar .brand .sig{width:26px;height:26px;border:1px solid var(--line-2);border-radius:50%;display:grid;place-items:center;
-  font-family:var(--latin);font-size:13px;color:var(--glow);letter-spacing:0}
-.topbar .brand small{font-family:var(--latin);font-size:10px;letter-spacing:.24em;color:var(--ink-3);font-weight:400}
-.topbar nav{display:flex;align-items:center;gap:clamp(12px,2.4vw,32px)}
-.topbar nav a{font-size:13px;letter-spacing:.1em;color:var(--ink-2);position:relative;padding:6px 0;transition:color .3s}
-.topbar nav a:hover,.topbar nav a[aria-current]{color:var(--ink)}
-.topbar nav a::after{content:"";position:absolute;left:0;right:100%;bottom:0;height:1px;background:var(--gold);transition:right .45s var(--ease)}
-.topbar nav a:hover::after,.topbar nav a[aria-current]::after{right:0}
-.topbar nav .out{color:var(--gold)}
+  justify-content:space-between;gap:24px;padding:0 clamp(18px,5vw,72px);border-bottom:0;
+  background:linear-gradient(180deg,rgba(9,10,12,.92),rgba(9,10,12,.5) 62%,rgba(9,10,12,0))}
+.topbar .brand{display:flex;align-items:baseline;gap:9px;flex-shrink:0}
+.topbar .brand .cn{font-family:var(--font-serif);font-size:17px;letter-spacing:.3em;color:#f4efe7;transition:color .4s ease}
+.topbar .brand .en{font-family:var(--font-sans);font-size:10px;letter-spacing:.24em;color:rgba(236,230,218,.45);text-transform:uppercase}
+.topbar nav{display:flex;align-items:center;gap:clamp(16px,2.6vw,38px)}
+.topbar nav a{position:relative;display:flex;flex-direction:row;align-items:center;gap:0;
+  padding:6px 0;transition:none;line-height:1.2}
+.topbar nav a .nav-cn{font-family:var(--font-serif);font-size:16px;letter-spacing:.2em;color:rgba(236,230,218,.72);transition:color var(--t-fast,.2s)}
+.topbar nav a .nav-en{display:none}
+.topbar nav a:hover .nav-cn,.topbar nav a[aria-current] .nav-cn{color:#f4efe7}
+.topbar nav a[aria-current] .nav-cn{font-weight:400}
+.topbar nav a[aria-current]::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:rgba(236,230,218,.5)}
 
 /* ---------- 翻页舞台 ---------- */
 /* 向下翻页：7 屏装进一条竖直轨道，整页向上滑出、下一页从下方滑入 */
@@ -298,8 +300,10 @@ html:not(.motion-ok) .belt-track{animation:none}
 
 @media(max-width:760px){
   :root{--nav-h:58px}
-  .topbar .brand small{display:none}
-  .topbar nav{gap:11px}.topbar nav a{font-size:11.5px;letter-spacing:.02em}
+  .topbar .brand .en{display:none}
+  .topbar .brand .cn{font-size:15px;letter-spacing:.18em}
+  .topbar nav{gap:12px}
+  .topbar nav a .nav-cn{font-size:13px;letter-spacing:.08em}
   .hero h1{font-size:clamp(38px,10.5vw,56px)}
   /* 窄屏：文字在上、盘子在下的竖排 */
   .hero .hero-row{flex-direction:column;align-items:stretch;justify-content:flex-start;
@@ -342,19 +346,20 @@ html:not(.motion-ok) .belt-track{animation:none}
   html.motion-ok .slide .rv{opacity:1!important;transform:none!important;filter:none!important}
 }
 </style>
+  <link rel="stylesheet" href="assets/css/assistant.css">
 </head>
 <body data-scene="0">
 
 <a class="skip" href="#main">跳到正文</a>
 
 <header class="topbar">
-  <a class="brand" href="#s0" data-goto="0"><span class="sig">青</span>青花·一线</a>
+  <a class="brand" href="#s0" data-goto="0"><span class="cn">青花·一线</span><span class="en">Blue &amp; White</span></a>
   <nav aria-label="主导航">
-    <a href="#s0" data-goto="0" aria-current="true">首页</a>
-    <a href="modules/timeline/immersive/walk/index.html" class="out">长廊</a>
-    <a href="modules/gallery/index.html" class="out">制瓷</a>
-    <a href="modules/ai/index.html" class="out">AI 制作</a>
-    <a href="modules/library/index.html" class="out">资料库</a>
+    <a href="#s0" data-goto="0" aria-current="true"><span class="nav-cn">首页</span><span class="nav-en">Home</span></a>
+    <a href="modules/gallery/index.html" class="out"><span class="nav-cn">制瓷</span><span class="nav-en">Craft</span></a>
+    <a href="modules/ai/index.html" class="out"><span class="nav-cn">AI 制作</span><span class="nav-en">AI Studio</span></a>
+    <a href="modules/timeline/immersive/walk/index.html" class="out"><span class="nav-cn">长廊</span><span class="nav-en">Timeline</span></a>
+    <a href="modules/library/index.html" class="out"><span class="nav-cn">资料库</span><span class="nav-en">Library</span></a>
   </nav>
 </header>
 
@@ -942,5 +947,6 @@ html:not(.motion-ok) .belt-track{animation:none}
   });
 })();
 </script>
+<script src="assets/js/assistant.js"></script>
 </body>
 </html>

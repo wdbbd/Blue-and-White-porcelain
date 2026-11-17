@@ -29,6 +29,13 @@ _backups/
 *.tmp
 *.bak
 *.bak-*
+*.timeline-bak
+_assistant_backup_*/
+_backup/
+_merge_backup_*/
+_remerge_backup_*/
+_shots/
+_tmp_extract*/
 
 # --- 编辑器 / IDE ---
 .idea/

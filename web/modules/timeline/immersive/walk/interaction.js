@@ -449,6 +449,9 @@ function buildIndex(root) {
         face.material = new THREE.MeshBasicMaterial({
           color: 0xffffff, transparent: true, opacity: 0, depthWrite: false,
         });
+        face.visible = false;   // 卡面永久隐藏：文字由中央信息栏承担
+        face.visible = false;   // 卡面永久隐藏：文字由中央信息栏承担
+        face.visible = false;   // 卡面永久隐藏：文字由中央信息栏承担
         cardIndex.set(o.name, {
           name: o.name, group: o, face,
           home: o.position.clone(), t: 0,
@@ -685,18 +688,15 @@ function updateStep(dt) {
     if (state.ui) state.ui.setStep(act);
   }
 
+/* ═══ 已禁用折叠弹出（固定贴墙）═══ */
+  // 卡片固定贴墙：不再位移、不再旋转、不做透明度呼吸
   for (const [, c] of cardIndex) {
-    const on = act && act.card === c.name;
-    c.t += ((on ? 1 : 0) - c.t) * CFG.ease;
-    const t = c.t > 0.999 ? 1 : (c.t < 0.001 ? 0 : c.t);
-
-    // 只从墙面轻轻抬出 10cm 并略微转向，绝不进入视野中心
+    c.t = 0;
     c.group.position.x = c.home.x;
     c.group.position.y = c.home.y;
-    c.group.position.z = c.home.z - CFG.pullOut * t;
-    c.group.rotation.y = CFG.tilt * t;
-
-    if (c.face.material) c.face.material.opacity = t;
+    c.group.position.z = c.home.z;
+    c.group.rotation.y = 0;
+    if (c.face) c.face.visible = false;
   }
 }
 

@@ -25,6 +25,7 @@ $RECYCLE.BIN/
 # --- 临时 / 解包目录 ---
 _tmp_extract/
 _work/
+_backups/
 *.tmp
 *.bak
 *.bak-*

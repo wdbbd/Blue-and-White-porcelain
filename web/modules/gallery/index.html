@@ -3,12 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>青花一线 · 制瓷工序 · 青瓷白</title>
+<title>青花一线 · 制瓷工序</title>
+<meta name="description" content="跟着一只玉壶春瓶走完八道制瓷工序：揉泥、拉坯、利坯、画坯、施釉、装匣、烧成、开窑——3D 交互演示，可亲手画坯、亲手烧一窑。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="青花一线 · 制瓷工序">
+<meta property="og:description" content="从一团泥到出窑的八道工序，3D 交互演示：亲手画坯、亲手烧一窑。">
 <link rel="stylesheet" href="../../assets/css/tokens.css">
 <link rel="stylesheet" href="../../assets/css/base.css">
 <link rel="stylesheet" href="../../assets/css/nav.css">
 <link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Serif+SC:wght@300;400;600;700&display=swap">
-<script src="https://fastly.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
+<script src="libs/three.min.js"></script>
 <style>
 /* ===== 基础 ===== */
 *,*::before,*::after{box-sizing:border-box}
@@ -105,7 +109,7 @@ body.stageing .cue{opacity:0;pointer-events:none}
 /* ===== 工序界面 ===== */
 .stageui{
   position:fixed;inset:0;z-index:5;pointer-events:none;
-  opacity:0;visibility:hidden;transition:opacity .5s ease,visibility .5s;
+  opacity:0;visibility:hidden;transition:opacity .25s ease,visibility .25s;
 }
 .stageui.on{opacity:1;visibility:visible}
 
@@ -164,6 +168,8 @@ body.navaway .topbar{padding-top:26px}
   font-size:13px;letter-spacing:.04em;color:rgba(236,230,218,.6);
 }
 .panel .hint b{width:5px;height:5px;background:var(--cobalt-lit);flex:none}
+.panel .hint.nudge{animation:hintnudge .55s ease 2}
+@keyframes hintnudge{50%{color:rgba(207,224,242,.95);letter-spacing:.09em}}
 
 /* 画坯 */
 .brush{display:flex;flex-wrap:wrap;align-items:center;gap:7px;margin-top:16px;pointer-events:auto}
@@ -629,7 +635,7 @@ const STAGES=[
 ];
 
 /* 烧成曲线：小时 → 温度 */
-const CURVE=[[0,20],[3,380],[6,700],[9,980],[12,1140],[15,1230],[18,1285],[22,1300]];
+const CURVE=[[0,20],[3,380],[6,700],[9,980],[12,1140],[15,1230],[18,1285],[22,1300],[24,1300]];
 function curveTemp(h){
   for(let i=1;i<CURVE.length;i++){
     if(h<=CURVE[i][0]){
@@ -647,10 +653,10 @@ const stageui=document.getElementById('stageui');
 
 function curveSVG(){
   const W=300,H=118,pad=24,padB=14;
-  const px=h=>pad+ (h/22)*(W-pad-10);
+  const px=h=>pad+ (h/24)*(W-pad-10);
   const py=t=>H-padB-(t/1350)*(H-padB-8);
   let pts='';
-  for(let h=0;h<=22;h+=0.5) pts+=(h?' ':'')+px(h).toFixed(1)+','+py(curveTemp(h)).toFixed(1);
+  for(let h=0;h<=24;h+=0.5) pts+=(h?' ':'')+px(h).toFixed(1)+','+py(curveTemp(h)).toFixed(1);
   const y1000=py(1000).toFixed(1);
   return '<figure class="curve">'+
     '<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="窑温随时间升到 1300 摄氏度的曲线">'+
@@ -659,11 +665,11 @@ function curveSVG(){
       '<polyline points="'+pts+'" fill="none" stroke="rgba(236,230,218,.55)" stroke-width="1.2"/>'+
       '<circle id="firedot" cx="'+pad+'" cy="'+(H-padB)+'" r="3" fill="#c9663a"/>'+
       '<text x="'+pad+'" y="'+(H-3)+'" fill="rgba(236,230,218,.35)" font-size="9.5" font-family="inherit">0 h</text>'+
-      '<text x="'+(W-8)+'" y="'+(H-3)+'" fill="rgba(236,230,218,.35)" font-size="9.5" text-anchor="end" font-family="inherit">22 h</text>'+
+      '<text x="'+(W-8)+'" y="'+(H-3)+'" fill="rgba(236,230,218,.35)" font-size="9.5" text-anchor="end" font-family="inherit">24 h</text>'+
       '<text x="'+(pad+2)+'" y="'+y1000+'" dy="-4" fill="rgba(201,102,58,.72)" font-size="9.5" font-family="inherit">1000 °C 起还原</text>'+
       '<text x="'+(W-10)+'" y="'+(py(1300)-5)+'" fill="rgba(236,230,218,.5)" font-size="9.5" text-anchor="end" font-family="inherit">1300 °C</text>'+
     '</svg>'+
-    '<figcaption><span>升温 22 小时 · 保温 · 闭窑冷却 48 小时</span><span id="temph">0 h</span></figcaption>'+
+    '<figcaption><span>升温 22 小时 · 保温 2 小时 · 闭窑冷却 48 小时</span><span id="temph">0 h</span></figcaption>'+
   '</figure>';
 }
 
@@ -1187,15 +1193,18 @@ function afterBrush(){
 
 /* ============ 5. 状态 ============ */
 const SPIN=[0.9,2.4,1.2,0,0.4,0,0,0];
+/* hf/wf：取景占比。0-2 阶段器物在长大，取景随形；
+   2 之后器型已锁死为成瓶，hf/wf 全部锁定——屏幕上大小不再变，
+   之后各阶段只动机位角度（elev）与视点（look）。 */
 const CAM=[
   {hf:0.34,wf:0.38,look:0.50,elev:0.20},
   {hf:0.70,wf:0.30,look:0.50,elev:0.15},
   {hf:0.70,wf:0.30,look:0.50,elev:0.11},
-  {hf:0.68,wf:0.32,look:0.50,elev:0.045},
-  {hf:0.66,wf:0.30,look:0.48,elev:0.13},
-  {hf:0.60,wf:0.28,look:0.46,elev:0.19},
-  {hf:0.68,wf:0.30,look:0.46,elev:0.025},
-  {hf:0.72,wf:0.32,look:0.50,elev:0.10}
+  {hf:0.70,wf:0.30,look:0.50,elev:0.045},
+  {hf:0.70,wf:0.30,look:0.48,elev:0.13},
+  {hf:0.70,wf:0.30,look:0.46,elev:0.19},
+  {hf:0.70,wf:0.30,look:0.46,elev:0.025},
+  {hf:0.70,wf:0.30,look:0.50,elev:0.10}
 ];
 
 let pRaw=0,pS=0,curIdx=-1,spin=0,spinSpeed=0,centred=0,holding=false;
@@ -1212,7 +1221,7 @@ function measure(){
   const tr=document.getElementById('track');
   const rect=tr.getBoundingClientRect();
   trackTop=rect.top+window.scrollY;
-  trackSpan=Math.max(1,rect.height-vh);
+  trackSpan=Math.max(1,rect.height);
   const craft=document.getElementById('craft');
   craftTop=craft.getBoundingClientRect().top+window.scrollY;
 }
@@ -1275,7 +1284,7 @@ function hudVals(idx,loc,sh){
     case 3: return ['轮速','0 rpm','已落笔',userStrokes.length+' 笔','钴料','珠明料','笔',brush==='wash'?'分水':'勾线'];
     case 4: return ['轮速','—','釉厚',(0.8*loc).toFixed(2)+' mm','蘸',Math.min(3,Math.ceil(loc*3))+' 次','器高',mm(sh.h)+' mm'];
     case 5: return ['窑位','3 号','匣钵','一只一器','器高',mm(sh.h)+' mm','状态',loc>0.9?'封窑':'装钵'];
-    case 6: return ['窑温',Math.round(tempShown)+' °C','历时',(clamp((pRaw-6)/0.86,0,1)*22).toFixed(1)+' h','焰',tempShown>1000?'还原':'氧化','状态',tempShown>1295?'保温':'升温'];
+    case 6: return ['窑温',Math.round(tempShown)+' °C','历时',(clamp((pRaw-6)/0.86,0,1)*24).toFixed(1)+' h','焰',tempShown>1000?'还原':'氧化','状态',tempShown>1295?'保温':'升温'];
     default: return ['通高','320 mm','最大径','196 mm','收缩','约 17 %','状态','出窑'];
   }
 }
@@ -1298,12 +1307,12 @@ function updateUI(idx,loc,sh){
     }
   }
   if(idx===6){
-    const hh=clamp((pRaw-6)/0.86,0,1)*22;
+    const hh=clamp((pRaw-6)/0.86,0,1)*24;
     if(tempvEl) tempvEl.textContent=Math.round(curveTemp(hh))+' °C';
     if(temphEl) temphEl.textContent=hh.toFixed(1)+' h';
     if(firedotEl){
       const W=300,H=118,pad=24,padB=14;
-      firedotEl.setAttribute('cx',(pad+(hh/22)*(W-pad-10)).toFixed(1));
+      firedotEl.setAttribute('cx',(pad+(hh/24)*(W-pad-10)).toFixed(1));
       firedotEl.setAttribute('cy',(H-padB-(curveTemp(hh)/1350)*(H-padB-8)).toFixed(1));
     }
   }
@@ -1320,7 +1329,7 @@ function updateUI(idx,loc,sh){
   const holdOK=(idx===0)&&!TOUCH;
   if(holdOK!==canvasEl.classList.contains('holding')) canvasEl.classList.toggle('holding',holdOK);
 
-  const uiOn=(window.scrollY>trackTop-vh*0.55)&&(window.scrollY<trackTop+trackSpan+vh*0.05);
+  const uiOn=(window.scrollY>trackTop-vh*0.55)&&(window.scrollY<trackTop+trackSpan-vh*0.55);
   if(uiOn!==stageui.classList.contains('on')){
     stageui.classList.toggle('on',uiOn);
     document.body.classList.toggle('stageing',uiOn);
@@ -1375,7 +1384,7 @@ function tick(now){
   if(holding) spinSpeed=lerp(spinSpeed,3.6,1-Math.exp(-3*dt));
 
   /* 温度与材质 */
-  const temp=(pRaw>=6&&pRaw<7)?curveTemp(clamp((pRaw-6)/0.86,0,1)*22):20;
+  const temp=(pRaw>=6&&pRaw<7)?curveTemp(clamp((pRaw-6)/0.86,0,1)*24):20;
   tempShown=temp;
   const blueT=pRaw>=7?1:smooth(1000,1250,temp);
   const bodyT_=smooth(5.2,6.9,pRaw);
@@ -1413,7 +1422,18 @@ function tick(now){
 }
 
 /* ============ 6. 交互 ============ */
+let nudgeT=0;
+function nudgeHint(){
+  const h=panelEls[3]&&panelEls[3].querySelector('.hint');
+  if(!h) return;
+  h.classList.remove('nudge');
+  void h.offsetWidth;
+  h.classList.add('nudge');
+  clearTimeout(nudgeT);
+  nudgeT=setTimeout(function(){h.classList.remove('nudge');},1400);
+}
 canvasEl.addEventListener('pointerdown',function(e){
+  if(curIdx===3&&!canvasEl.classList.contains('paintable')&&!canvasEl.classList.contains('holding')) nudgeHint();
   if(canvasEl.classList.contains('paintable')){
     if(paintStart(e)){
       pointerMode='paint';

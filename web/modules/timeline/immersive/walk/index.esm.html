@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<title>青花瓷 · 千年青史 · 时间走廊</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{width:100%;height:100%;overflow:hidden;background:#0d1620;
+    font-family:"Microsoft YaHei","PingFang SC",sans-serif;color:#e8eef2}
+  canvas{display:block}
+
+  /* 载入 / 开场 */
+  #gate{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;
+    justify-content:center;gap:26px;background:radial-gradient(circle at 50% 45%,#1b2a3a 0%,#0a1018 70%);
+    z-index:40;transition:opacity .8s}
+  #gate.hide{opacity:0;pointer-events:none}
+  #gate h1{font-size:38px;letter-spacing:.42em;font-weight:300;color:#E7DCC4;
+    text-shadow:0 0 26px rgba(200,170,110,.35)}
+  #gate .sub{font-size:13px;letter-spacing:.34em;color:#7f93a8}
+  #gate .line{width:220px;height:1px;background:linear-gradient(90deg,transparent,#C9A227,transparent)}
+  #loadTxt{font-size:13px;letter-spacing:.16em;color:#93a7bb;min-height:20px}
+  #enter{margin-top:6px;padding:13px 42px;border:1px solid rgba(201,162,39,.6);
+    background:rgba(201,162,39,.08);color:#E7DCC4;font-size:14px;letter-spacing:.3em;
+    cursor:pointer;transition:.25s;opacity:.35;pointer-events:none}
+  #enter.on{opacity:1;pointer-events:auto}
+  #enter:hover{background:rgba(201,162,39,.22);border-color:#C9A227}
+
+  /* 顶部信息 → 改为画面中下方悬浮条 */
+  #brand{position:fixed;right:30px;top:24px;font-size:12px;letter-spacing:.36em;
+    color:#6f8499;pointer-events:none;z-index:20}
+  /* 画面中央悬浮金字 */
+  #infoBar{position:fixed;left:50%;top:57%;transform:translate(-50%,-44%);
+    max-width:min(900px,78vw);padding:38px 56px;
+    background:radial-gradient(ellipse at center,rgba(6,10,16,.52) 0%,rgba(6,10,16,0) 72%);
+    text-align:center;pointer-events:none;z-index:22;
+    opacity:0;transition:opacity .55s ease,transform .55s ease}
+  #infoBar.on{opacity:1;transform:translate(-50%,-50%)}
+  #eraRow{font-size:17px;letter-spacing:.52em;color:rgba(245,217,139,.78);
+    text-shadow:0 2px 14px rgba(0,0,0,.7)}
+  #eraRow b{color:#F7DE9C;font-weight:600;letter-spacing:.18em;font-size:20px}
+  #stepTitle{font-size:56px;letter-spacing:.32em;margin:22px 0 20px;
+    color:#F8E3A8;
+    text-shadow:0 0 34px rgba(247,222,156,.5),0 0 12px rgba(255,231,170,.35),
+                0 3px 22px rgba(0,0,0,.65)}
+  #stepDesc{font-size:19px;line-height:1.95;letter-spacing:.12em;
+    color:rgba(242,235,219,.9);text-shadow:0 2px 16px rgba(0,0,0,.75)}
+  @keyframes cardIn{from{opacity:0;transform:translateY(20px) scale(.975)}to{opacity:1;transform:none}}
+  #infoBar.swap #eraRow,#infoBar.swap #stepTitle,#infoBar.swap #stepDesc{
+    animation:cardIn .55s cubic-bezier(.22,.8,.3,1) both}
+  #infoBar.swap #stepTitle{animation-delay:.05s}
+  #infoBar.swap #stepDesc{animation-delay:.12s}
+
+  /* 进度条 */
+  #progWrap{position:fixed;left:0;right:0;bottom:0;height:3px;background:rgba(255,255,255,.06);z-index:20}
+  #progBar{height:100%;width:0;background:linear-gradient(90deg,#2F5B8C,#C9A227);
+    box-shadow:0 0 14px rgba(201,162,39,.6);transition:width .12s linear}
+
+  /* 底部提示 */
+  #hud{position:fixed;left:50%;bottom:108px;transform:translateX(-50%);
+    font-size:16px;letter-spacing:.16em;color:#a9bccf;text-align:center;
+    pointer-events:none;text-shadow:0 1px 8px rgba(0,0,0,.9);opacity:.92;z-index:45}
+  #hud b{color:#C9A227;font-weight:600}
+  #dbg{position:fixed;left:14px;bottom:14px;max-width:62vw;padding:10px 14px;
+    font:11px/1.6 Consolas,monospace;color:#9fe3b8;background:rgba(4,8,12,.75);
+    border:1px solid rgba(120,220,160,.25);white-space:pre-wrap;z-index:30;
+    pointer-events:none;border-radius:3px;display:none}
+  #dbg.on{display:block}
+  /* 悬停名称浮层 */
+  #tip{position:fixed;left:0;top:0;z-index:26;pointer-events:none;opacity:0;
+    transform:translate(-50%,-135%);transition:opacity .12s linear;
+    padding:8px 16px;border-radius:2px;
+    background:rgba(8,13,20,.78);border:1px solid rgba(201,162,39,.45);
+    color:#F2E4C4;font-size:15px;letter-spacing:.1em;white-space:nowrap;
+    text-shadow:0 1px 8px rgba(0,0,0,.8);box-shadow:0 10px 30px rgba(0,0,0,.5)}
+  #tip.on{opacity:1}
+  /* 入口暗场：从门口走到唐门时逐渐揭开 */
+  #vignette{position:fixed;inset:0;pointer-events:none;z-index:14;opacity:0;
+    background:radial-gradient(ellipse at 50% 56%,
+      rgba(3,6,10,0) 22%, rgba(3,6,10,.55) 62%, rgba(3,6,10,.95) 100%);
+    transition:opacity .18s linear}
+
+  /* 详情浮层 */
+  #detail{position:fixed;inset:0;display:none;align-items:center;justify-content:center;
+    background:rgba(6,10,16,.82);backdrop-filter:blur(6px);z-index:50;padding:4vh 4vw}
+  #detail.on{display:flex}
+  #detailCard{display:flex;gap:34px;max-width:1040px;width:100%;
+    background:#F2EDE2;color:#1C2536;border:1px solid #C9A227;
+    box-shadow:0 30px 80px rgba(0,0,0,.7);padding:34px}
+  #detailCard img{width:46%;height:auto;object-fit:cover;border:1px solid #B9AE97}
+  #detailBody{flex:1;display:flex;flex-direction:column;gap:14px}
+  #detailNo{font-size:13px;letter-spacing:.3em;color:#A8323C}
+  #detailTitle{font-size:30px;letter-spacing:.12em;color:#16233A}
+  #detailDesc{font-size:15px;line-height:2;color:#4A5464}
+  #detailClose{align-self:flex-end;margin-top:auto;font-size:13px;letter-spacing:.2em;
+    color:#8A6B2A;cursor:pointer;border-bottom:1px solid rgba(138,107,42,.4);padding-bottom:4px}
+</style>
+</head>
+<body>
+
+<canvas id="c"></canvas>
+
+<div id="brand">青花瓷 · 时间长廊</div>
+
+<div id="infoBar">
+  <div id="eraRow">—</div>
+  <div id="stepTitle"></div>
+  <div id="stepDesc"></div>
+</div>
+
+<div id="progWrap"><div id="progBar"></div></div>
+<div id="hud">滚轮 <b>行走</b> · 拖拽 <b>转头</b> · 悬停 <b>看图片介绍</b> · 点击 <b>看图片</b> · R <b>回到起点</b></div>
+<div id="dbg" class="on">诊断中…</div>
+<div id="vignette"></div>
+<div id="tip"></div>
+
+<div id="detail">
+  <div id="detailCard">
+    <img id="detailImg" alt="" />
+    <div id="detailBody">
+      <div id="detailNo"></div>
+      <div id="detailTitle"></div>
+      <div id="detailDesc"></div>
+      <div id="detailClose">关 闭</div>
+    </div>
+  </div>
+</div>
+
+<div id="gate">
+  <h1>千 年 青 史</h1>
+  <div class="line"></div>
+  <div class="sub">青 花 瓷 · 时 间 长 廊</div>
+  <div id="loadTxt">正在载入…</div>
+  <button id="enter">入 廊</button>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "./lib/three.module.js",
+    "three/addons/": "./lib/"
+  }
+}
+</script>
+
+<script type="module">
+import { start } from './interaction.js';
+
+const $ = (id) => document.getElementById(id);
+
+let entered = false;
+function enterNow(){
+  if (entered) return;
+  entered = true;
+  $('gate').classList.add('hide');
+  window.__started = true;
+}
+
+const ui = {
+  setLoad(t){ $('loadTxt').textContent = t || ''; },
+  enableStart(){
+    $('enter').classList.add('on');
+    // 加载完成直接进廊，一步到位，不用再点
+    setTimeout(enterNow, 320);
+  },
+  onProgress(p){ $('progBar').style.width = (p*100).toFixed(1) + '%'; },
+  setEra(name){ $('eraRow').innerHTML = name; },
+  setDark(v){ $('vignette').style.opacity = v; },
+  setStep(step){
+    const bar = $('infoBar');
+    if (!step){ bar.classList.remove('on'); return; }
+    $('eraRow').innerHTML = `${step.era.name}　·　第 <b>${String(step.i).padStart(2,'0')}</b> 道工序`;
+    $('stepTitle').textContent = step.name;
+    $('stepDesc').textContent = step.desc;
+    bar.classList.add('on');
+    bar.classList.remove('swap');
+    void bar.offsetWidth;
+    bar.classList.add('swap');
+  },
+  showDetail(step){
+    $('detailImg').src = '../assets/patterns/' + step.img;
+    $('detailNo').textContent = step.era.name + '　工序 ' + String(step.i).padStart(2,'0');
+    $('detailTitle').textContent = step.name;
+    $('detailDesc').textContent = step.desc;
+    $('detail').classList.add('on');
+  }
+};
+
+$('detailClose').addEventListener('click', () => $('detail').classList.remove('on'));
+$('detail').addEventListener('click', (e) => {
+  if (e.target.id === 'detail') $('detail').classList.remove('on');
+});
+addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') $('detail').classList.remove('on');
+  if (e.key === 'Escape') window.parent && window.parent !== window && history.length > 1 && history.back();
+});
+
+$('enter').addEventListener('click', enterNow);
+
+start($('c'), ui);
+</script>
+</body>
+</html>

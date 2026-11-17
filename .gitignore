@@ -1,0 +1,44 @@
+# ===== 青瓷白 · 排除项 =====
+
+# --- Node / 依赖 ---
+node_modules/
+npm-debug.log*
+yarn-error.log*
+package-lock.json
+
+# --- 环境变量 / 密钥（绝不能提交）---
+.env
+.env.local
+.env.*.local
+*.key
+*.pem
+
+# --- 系统文件 ---
+.DS_Store
+Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
+
+# --- 日志 ---
+*.log
+
+# --- 临时 / 解包目录 ---
+_tmp_extract/
+_work/
+*.tmp
+*.bak
+
+# --- 编辑器 / IDE ---
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# --- WorkBuddy 本地数据（非缓存，但属本地工作区）---
+.workbuddy/
+
+# --- 大体积素材压缩包（不随代码仓库分发）---
+资料素材/
+
+# --- 系统 ACL 权限恢复备份（与项目无关，可能含本机敏感路径）---
+acl-recovery/

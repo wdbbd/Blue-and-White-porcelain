@@ -1,0 +1,72 @@
+/* ============================================================
+   青瓷白· 设计令牌 (Design Tokens)
+   ------------------------------------------------------------
+   ⚠️ 全站唯一的颜色/间距/字号定义处。
+   三位负责人如需调整视觉，只需改本文件，不必动其他任何文件。
+
+   配色取自青花瓷本身：
+   宣纸  — 瓷胎的白，页面底色
+   天青  — 汝窑釉色，主色
+   靛青  — 钴蓝深料，正文标题
+   月白  — 釉面高光，卡片面
+   胭脂  — 印泥红，仅用于印章式点缀
+   ============================================================ */
+
+:root {
+  /* ---------- 色彩 ---------- */
+  --c-paper:      #f7f4ed;   /* 宣纸白· 页面底色 */
+  --c-paper-warm: #f1ece1;   /* 宣纸（深一度）· 分区底 */
+  --c-moon:       #eae6dc;   /* 月白   · 卡片/面板 */
+  --c-celadon:    #7a9e9e;   /* 天青   · 主色 */
+  --c-celadon-d:  #5d8080;   /* 天青（深）· hover */
+  --c-celadon-l:  #a8c0b4;   /* 影青   · 浅主色 */
+  --c-indigo:     #22456e;   /* 靛青   · 标题 */
+  --c-indigo-d:   #162f4d;   /* 靛青（深）· 页脚 */
+  --c-ink:        #1c2536;   /* 墨青   · 正文 */
+  --c-ink-soft:   #55606e;   /* 墨青（淡）· 次要文字 */
+  --c-cinnabar:   #a8323c;   /* 胭脂   · 印章点缀 */
+  --c-gamboge:    #c9a227;   /* 藤黄   · 描边高亮 */
+  --c-line:       #ddd6c7;   /* 釉线   · 分隔线 */
+  --c-line-soft:  #e9e4d8;
+
+  /* 语义别名（优先用这些，换肤时只改上面） */
+  --bg:            var(--c-paper);
+  --bg-alt:        var(--c-paper-warm);
+  --surface:       #fffdf8;
+  --text:          var(--c-ink);
+  --text-soft:     var(--c-ink-soft);
+  --title:         var(--c-indigo);
+  --brand:         var(--c-celadon);
+  --brand-hover:   var(--c-celadon-d);
+  --accent:        var(--c-cinnabar);
+
+  /* ---------- 字体 ---------- */
+  --font-serif: "Songti SC", "STSong", "SimSun", "Noto Serif SC", serif;
+  --font-sans:  "PingFang SC", "Microsoft YaHei", "Noto Sans SC", system-ui, sans-serif;
+
+  /* ---------- 尺度 ---------- */
+  --nav-h: 62px;
+  --wrap: 1380px;          /* 内容最大宽度 */
+  --wrap-narrow: 860px;    /* 正文类页面宽度 */
+  --r-sm: 2px;             /* 极小圆角，保持方正雅致 */
+  --r-md: 3px;
+  --shadow-soft: 0 1px 2px rgba(28, 37, 54, .04), 0 8px 24px rgba(28, 37, 54, .05);
+  --shadow-lift: 0 2px 4px rgba(28, 37, 54, .05), 0 16px 40px rgba(28, 37, 54, .09);
+
+  /* ---------- 动效 ---------- */
+  --ease: cubic-bezier(.22, .61, .36, 1);
+  --t-fast: .18s var(--ease);
+  --t-mid:  .34s var(--ease);
+
+  /* ---------- 层级 ---------- */
+  --z-nav: 100;
+  --z-modal: 200;
+}
+
+/* 尊重系统的「减少动态效果」设置 */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    transition-duration: .01ms !important;
+  }
+}

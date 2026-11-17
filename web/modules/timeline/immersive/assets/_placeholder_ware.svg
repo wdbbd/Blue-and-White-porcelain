@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="420" height="336" viewBox="0 0 420 336">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f3f6f4"/>
+      <stop offset="100%" stop-color="#dbe6e1"/>
+    </linearGradient>
+    <linearGradient id="vase" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#eaf1ee"/>
+      <stop offset="45%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#cfdcd6"/>
+    </linearGradient>
+  </defs>
+  <rect width="420" height="336" fill="url(#bg)"/>
+  <g stroke="#7d9b92" stroke-width="1" opacity="0.45">
+    <line x1="0" y1="280" x2="420" y2="280"/>
+  </g>
+  <!-- 瓷瓶 -->
+  <path d="M210 62
+           c-6 0 -10 4 -10 9 0 4 3 7 7 8
+           c-16 5 -26 20 -26 40
+           c0 16 6 26 14 33
+           c-10 8 -16 20 -16 34
+           c0 30 24 52 31 52
+           c7 0 31 -22 31 -52
+           c0 -14 -6 -26 -16 -34
+           c8 -7 14 -17 14 -33
+           c0 -20 -10 -35 -26 -40
+           c4 -1 7 -4 7 -8 0 -5 -4 -9 -10 -9 z"
+        fill="url(#vase)" stroke="#4e6b64" stroke-width="2"/>
+  <!-- 青花纹样 -->
+  <g fill="none" stroke="#2f5b8c" stroke-width="2.2" opacity="0.8">
+    <path d="M170 150 q20 -14 40 0 q20 14 40 0"/>
+    <path d="M170 176 q20 14 40 0 q20 -14 40 0"/>
+    <circle cx="190" cy="163" r="6"/>
+    <circle cx="230" cy="163" r="6"/>
+    <path d="M180 210 q30 -16 60 0"/>
+  </g>
+  <text x="210" y="308" text-anchor="middle" font-family="serif" font-size="17"
+        fill="#5a6f69" letter-spacing="3">器物图 · 待替换</text>
+</svg>

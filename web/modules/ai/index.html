@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI 生图 · 青瓷白</title>
+<meta name="description" content="青花瓷 AI 生图工坊：选择缠枝牡丹、云龙、海水江崖等青花样式，写下你的意象，生成一只独一无二的青花圆盘。">
+<link rel="stylesheet" href="../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../assets/css/base.css">
+<link rel="stylesheet" href="../../assets/css/nav.css">
+<link rel="stylesheet" href="ai.css?v=20261114a">
+</head>
+<body class="ai-page" data-page="ai">
+
+<section class="ai-hero">
+  <div class="ai-wrap">
+    <span class="seal-mark">AI 生图 · 生成式青花</span>
+    <h1>把心里的青花，烧出来</h1>
+    <em>Blue &amp; White Generative Studio</em>
+    <p class="lead">
+      左边选一种青花纹样，它会成为圆盘的缠枝边饰；右边写下你想要的画面——
+      龙、海、月、莲、山水、花鸟，AI 会为你题名、写诗，并生成一只真正的青花圆盘。
+    </p>
+    <div class="ai-badges">
+      <span><b>一</b> 选纹样</span>
+      <span><b>二</b> 写意象</span>
+      <span><b>三</b> AI 真图出青花</span>
+      <span>每次生成都有独立 seed，可保存原图</span>
+    </div>
+  </div>
+</section>
+
+<main class="ai-wrap ai-work">
+  <!-- 左：样式 -->
+  <aside class="style-panel">
+    <div class="panel-head">
+      <span class="panel-no">一</span>
+      <div>
+        <h2>选一种青花样式</h2>
+        <p>边饰取自站内真实纹样。点一张，它会成为这次生成的边饰；写下意象后一起交给 AI。</p>
+      </div>
+    </div>
+    <div class="style-grid" id="styleGrid" role="group" aria-label="青花样式"></div>
+    <div class="style-note">
+      所选纹样会环绕盘沿铺开，并决定这只盘的色感；中间的主纹则由你写下的意象决定。
+      同一组「纹样 + 意象 + seed」可以复现同一只盘。
+    </div>
+  </aside>
+
+  <!-- 右：圆盘生成器 -->
+  <section class="gen-panel" aria-label="AI 青花圆盘生成器">
+    <div class="plate-stage" id="plateStage">
+      <div class="plate-glow" aria-hidden="true"></div>
+      <svg class="plate-orbit" viewBox="0 0 760 760" aria-hidden="true">
+        <defs>
+          <path id="orbitPath" d="M380,380 m-348,0 a348,348 0 1,1 696,0 a348,348 0 1,1 -696,0"/>
+        </defs>
+        <text><textPath href="#orbitPath" startOffset="0">青花 · AI 生图 · 一色千年 · GENERATIVE PORCELAIN · </textPath></text>
+      </svg>
+
+      <div class="plate">
+        <img id="plate" alt="AI 生成的青花圆盘" loading="eager">
+        <div class="plate-empty" id="plateEmpty">
+          <span class="pe-kicker">AI · 青花</span>
+          <p>选一种纹样，写下意象<br>生成一只真正的 AI 青花盘</p>
+        </div>
+        <div class="plate-gloss" aria-hidden="true"></div>
+        <div class="plate-loading" id="plateLoading" hidden>
+          <div class="load-ring" aria-hidden="true"></div>
+          <div class="load-t" id="loadText">研墨 · 调钴料</div>
+          <div class="load-p"><i id="loadBar"></i></div>
+          <div class="load-s" id="loadSub">AI 正在把文字译成青花</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="plate-caption" aria-live="polite">
+      <div class="cap-title" id="capTitle"></div>
+      <div class="cap-line" id="capLine"></div>
+      <div class="cap-meta" id="capMeta"></div>
+    </div>
+
+    <div class="prompt-card">
+      <div class="prompt-head">
+        <span class="panel-no">二</span>
+        <label for="prompt">写下你想要的画面</label>
+        <span class="style-now" id="styleNow">缠枝牡丹</span>
+      </div>
+      <div class="prompt-row">
+        <input id="prompt" type="text" maxlength="60" autocomplete="off"
+               placeholder="比如：月下青花，一枝梅影 / 海上云龙 / 一池莲花">
+        <button class="gen-btn" id="genBtn" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19c4-9 9-13 16-15-2 7-6 12-15 16"/><path d="M4 19c3-2 6-3 9-3"/></svg>
+          <span>生成</span>
+        </button>
+      </div>
+      <div class="chips" id="chips"></div>
+      <div class="prompt-foot">
+        <span class="stat" id="status">选好纹样，写下意象，点「生成」。</span>
+        <div class="acts">
+          <button id="shuffle" type="button">换一个</button>
+          <button id="dl2" type="button">保存原图</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<section class="ai-steps">
+  <div class="wrap">
+    <div class="ai-step">
+      <span class="n">壹</span>
+      <div><h4>边饰来自馆藏</h4><p>盘沿的缠枝、龙鳞、浪头不是随手画的线条，而是从馆藏纹样里提取的边饰描述，交给图像模型重新生成。</p></div>
+    </div>
+    <div class="ai-step">
+      <span class="n">贰</span>
+      <div><h4>文字变成画面</h4><p>「月下」会点亮一轮月，「海上云龙」会让龙身翻出云气；你写的意象会成为圆盘的中心画面。</p></div>
+    </div>
+    <div class="ai-step">
+      <span class="n">叁</span>
+      <div><h4>AI 真图，落款成瓷</h4><p>图像模型生成圆盘，DeepSeek 起四字题名、写一句诗；接口未连接时保留本地题名，图像仍由 AI 生成。</p></div>
+    </div>
+  </div>
+</section>
+
+<script src="../../assets/data/site.config.js?v=20261116"></script>
+<script src="../../assets/js/site.js?v=20261116"></script>
+<script src="ai.js"></script>
+</body>
+</html>

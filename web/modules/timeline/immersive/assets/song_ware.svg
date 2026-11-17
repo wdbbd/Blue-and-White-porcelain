@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="384" viewBox="0 0 480 384">
+  <defs>
+    <linearGradient id="wbg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f7faf8"/><stop offset="100%" stop-color="#dfe9e4"/>
+    </linearGradient>
+    <linearGradient id="vase" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#dfe9e4"/><stop offset="42%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#c6d5ce"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="52%" r="52%">
+      <stop offset="0%" stop-color="#cfe0d8" stop-opacity="0.38"/>
+      <stop offset="100%" stop-color="#cfe0d8" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="480" height="384" fill="url(#wbg)"/>
+  <ellipse cx="240" cy="210" rx="150" ry="150" fill="url(#glow)"/>
+  <ellipse cx="240" cy="330" rx="120" ry="14" fill="#9fb3ab" opacity="0.25"/>
+  <path d="M240 58 c-7 0 -12 5 -12 11 0 5 4 8 8 9
+           c-19 6 -30 24 -30 47 0 19 7 30 16 38
+           c-12 9 -19 23 -19 39 0 35 28 60 37 60
+           c8 0 37 -25 37 -60 0 -16 -7 -30 -19 -39
+           c9 -8 16 -19 16 -38 0 -23 -11 -41 -30 -47
+           c4 -1 8 -4 8 -9 0 -6 -5 -11 -12 -11 z"
+        fill="url(#vase)" stroke="#8fa39b" stroke-width="2.6"/>
+  <g fill="none" stroke="#8fa39b" stroke-width="2.6" opacity="0.82">
+    <path d="M196 168 q22 -16 44 0 q22 16 44 0"/>
+    <path d="M196 198 q22 16 44 0 q22 -16 44 0"/>
+    <path d="M204 236 q36 -18 72 0"/>
+    <circle cx="218" cy="183" r="7"/><circle cx="262" cy="183" r="7"/>
+    <circle cx="240" cy="218" r="6"/>
+  </g>
+  <rect x="150" y="52" width="180" height="26" rx="13" fill="#8fa39b" opacity="0.9"/>
+  <text x="240" y="70" text-anchor="middle" font-family="serif" font-size="15"
+        fill="#fff" letter-spacing="4">宋代 · 器物</text>
+  <text x="240" y="366" text-anchor="middle" font-family="serif" font-size="14"
+        fill="#5a6f69" letter-spacing="3">缠枝莲花</text>
+</svg>

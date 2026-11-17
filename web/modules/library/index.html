@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>资料库 · 青瓷白</title>
+<meta name="description" content="全部青花瓷纹样、器型与文献影像归档，支持关键词检索与智能问答。">
+<link rel="stylesheet" href="../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../assets/css/base.css">
+<link rel="stylesheet" href="../../assets/css/nav.css">
+<link rel="stylesheet" href="library.css">
+</head>
+<body data-page="library">
+
+<section class="lib-head">
+  <div class="wrap">
+    <span class="seal-mark">资料归档</span>
+    <h1 class="h-sec">资料库</h1>
+    <p class="lead">
+      全部纹样、器型与匠人资料收于此。输入关键词检索，或直接提问——
+      比如「元代梅瓶为什么小口」「康熙青花的特点」。
+    </p>
+
+    <!-- 检索 + 问答 -->
+    <div class="ask-box">
+      <div class="ask-tabs">
+        <button class="atab on" data-mode="search">关键词检索</button>
+        <button class="atab" data-mode="ai">智能问答</button>
+      </div>
+
+      <!-- 检索模式 -->
+      <div class="ask-mode on" id="modeSearch">
+        <div class="ask-row">
+          <input type="search" id="q" placeholder="输入器物名、朝代或纹样，如：梅瓶 / 康熙 / 缠枝莲" autocomplete="off">
+          <button class="btn btn-solid" id="qBtn">检索</button>
+        </div>
+        <div class="chips" id="chips"></div>
+      </div>
+
+      <!-- 问答模式 -->
+      <div class="ask-mode" id="modeAI">
+        <div class="ask-row">
+          <input type="text" id="qAI" placeholder="向青花瓷提问，如：元青花和明青花的钴料有什么区别？" autocomplete="off">
+          <button class="btn btn-solid" id="aiBtn">提问</button>
+        </div>
+        <div class="ai-note" id="aiNote">
+          <span class="dot"></span>
+          <span id="aiNoteTx">AI 问答需要配置接口后方可使用，未配置时仅展示资料库内的检索结果。</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 筛选 -->
+<section class="filters wrap" id="filters" hidden>
+  <div class="f-row">
+    <div class="f-group" id="fType"></div>
+  </div>
+  <div class="f-row">
+    <div class="f-group" id="fEra"></div>
+  </div>
+  <div class="f-meta">
+    <span id="fCount"></span>
+    <button class="linkbtn" id="fClear">清空筛选</button>
+  </div>
+</section>
+
+<!-- 结果 -->
+<section class="results wrap" id="results" hidden>
+  <div class="r-grid" id="rGrid"></div>
+  <div class="r-empty" id="rEmpty" hidden>
+    <div class="e-t">没有找到相关资料</div>
+    <p>试试更短的关键词，比如「梅瓶」「康熙」「缠枝莲」</p>
+  </div>
+</section>
+
+<!-- 默认展示：全部 -->
+<section class="all wrap" id="all">
+  <div class="a-head reveal">
+    <h2 class="h-sub">全部资料</h2>
+    <p class="lead">共 <b id="aCount">—</b> 条，按类别浏览。</p>
+  </div>
+  <div class="a-tabs" id="aTabs"></div>
+  <div class="r-grid" id="aGrid"></div>
+  <div class="a-more"><button class="btn" id="aMore">加载更多</button></div>
+</section>
+
+<script src="../../assets/data/site.config.js?v=20261116"></script>
+<script src="../../assets/data/masters.js"></script>
+<script src="../../assets/js/site.js?v=20261116"></script>
+<script src="ai.js"></script>
+<script src="library.js"></script>
+</body>
+</html>

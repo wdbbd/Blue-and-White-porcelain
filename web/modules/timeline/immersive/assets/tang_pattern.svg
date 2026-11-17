@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="384" viewBox="0 0 480 384">
+  <defs>
+    <linearGradient id="pbg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f2f6f4"/><stop offset="100%" stop-color="#d8e4de"/>
+    </linearGradient>
+  </defs>
+  <rect width="480" height="384" fill="url(#pbg)"/>
+  <g fill="none" stroke="#8b7355" stroke-width="3" opacity="0.8">
+    <path d="M40 280 C120 200 150 130 240 104 C330 78 360 156 440 104"/>
+    <path d="M40 330 C130 268 165 210 240 188 C320 164 375 220 440 176"/>
+    <path d="M60 226 C130 168 190 226 240 180 C296 128 360 168 420 122"/>
+  </g>
+  <g fill="#c9a05a">
+    <circle cx="134" cy="166" r="11"/><circle cx="240" cy="128" r="13"/>
+    <circle cx="346" cy="146" r="10"/><circle cx="182" cy="234" r="9"/>
+    <circle cx="298" cy="214" r="9"/>
+  </g>
+  <g fill="#8b7355" opacity="0.75">
+    <circle cx="134" cy="166" r="5"/><circle cx="240" cy="128" r="6"/>
+    <circle cx="346" cy="146" r="4"/>
+  </g>
+  <g fill="none" stroke="#8b7355" stroke-width="2" opacity="0.45">
+    <rect x="28" y="28" width="424" height="328" rx="4"/>
+    <rect x="40" y="40" width="400" height="304" rx="3"/>
+  </g>
+  <rect x="160" y="52" width="160" height="26" rx="13" fill="#8b7355" opacity="0.9"/>
+  <text x="240" y="70" text-anchor="middle" font-family="serif" font-size="15"
+        fill="#fff" letter-spacing="4">唐代 · 纹样</text>
+  <text x="240" y="366" text-anchor="middle" font-family="serif" font-size="14"
+        fill="#5a6f69" letter-spacing="3">点彩花草</text>
+</svg>

@@ -1,0 +1,401 @@
+/* =====================================================================
+   青花瓷 · 千年纹样时空漫游   —— 样式表
+   设计基调：国风简约 / 低饱和青瓷配色 / 不遮挡主 3D 画面
+   ===================================================================== */
+
+/* ---------- 全局色彩变量（改色只需改这里） ---------- */
+:root {
+  --ink:            #1d2a2a;   /* 主文字 · 墨色 */
+  --ink-soft:       #4a5f5f;   /* 次级文字 */
+  --celadon:        #7d9b92;   /* 青瓷绿 */
+  --celadon-deep:   #4e6b64;   /* 深青瓷 */
+  --celadon-light:  #c8d8d2;   /* 浅青瓷 */
+  --porcelain:      #f3f6f4;   /* 瓷白 */
+  --cobalt:         #2f5b8c;   /* 青花蓝 */
+  --cobalt-soft:    #5b83ad;   /* 淡青花 */
+  --gold:           #b79a63;   /* 描金 / 点缀 */
+  --panel-bg:       rgba(246, 249, 247, 0.86);
+  --panel-bg-dark:  rgba(30, 42, 41, 0.86);
+  --shadow-soft:    0 6px 26px rgba(31, 48, 46, 0.16);
+  --radius:         4px;
+  --font-cn:        "Songti SC", "STSong", "SimSun", "Noto Serif SC", serif;
+  --font-ui:        "PingFang SC", "Microsoft YaHei", "Hiragino Sans GB", sans-serif;
+}
+
+/* ---------- 基础重置 ---------- */
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #0e1414;
+  font-family: var(--font-ui);
+  color: var(--ink);
+  /* 禁止移动端手势干扰（比赛为电脑端，此处保证拖拽体验） */
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* =====================================================================
+   1. 3D 主画布
+   ===================================================================== */
+#scene-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  z-index: 1;
+  cursor: grab;
+}
+#scene-canvas.dragging { cursor: grabbing; }
+
+/* UI 层容器：默认不拦截鼠标事件，避免挡住 3D 交互 */
+body > aside,
+body > header,
+body > footer,
+#hint-panel,
+#crosshair,
+#center-toast {
+  z-index: 10;
+}
+
+/* =====================================================================
+   2. 左上角 操作提示
+   ===================================================================== */
+#hint-panel {
+  position: fixed;
+  top: 22px;
+  left: 26px;
+  padding: 14px 18px 12px;
+  background: var(--panel-bg);
+  border: 1px solid rgba(125, 155, 146, 0.45);
+  border-left: 3px solid var(--celadon);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(6px);
+  max-width: 250px;
+  pointer-events: none;      /* 提示面板默认不拦截点击 */
+  animation: fadeInDown .8s ease both;
+}
+/* 返回长廊链接：单独放开点击 */
+#hint-panel .hint-back {
+  display: inline-block;
+  margin-top: 11px;
+  padding-top: 9px;
+  border-top: 1px solid rgba(125, 155, 146, 0.35);
+  width: 100%;
+  pointer-events: auto;
+  font-size: 12px;
+  letter-spacing: 1.5px;
+  color: var(--celadon-deep);
+  text-decoration: none;
+  transition: color .25s;
+}
+#hint-panel .hint-back:hover { color: var(--cobalt); }
+#hint-panel .hint-title {
+  font-family: var(--font-cn);
+  font-size: 14px;
+  letter-spacing: 3px;
+  color: var(--celadon-deep);
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(125, 155, 146, 0.35);
+}
+#hint-panel ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 12px;
+  line-height: 1.9;
+  color: var(--ink-soft);
+}
+#hint-panel ul b {
+  color: var(--cobalt);
+  font-weight: 600;
+  letter-spacing: .5px;
+}
+
+/* =====================================================================
+   4. 底部居中：朝代标题 + 简介
+   ===================================================================== */
+#dynasty-panel {
+  position: fixed;
+  left: 50%;
+  bottom: 30px;
+  transform: translateX(-50%);
+  width: min(660px, 56vw);
+  padding: 16px 30px 14px;
+  text-align: center;
+  background: linear-gradient(180deg, rgba(246,249,247,.92), rgba(238,243,241,.88));
+  border: 1px solid rgba(125, 155, 146, 0.5);
+  border-top: 2px solid var(--celadon);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(7px);
+  pointer-events: none;
+  transition: opacity .6s ease, transform .6s ease;
+}
+#dynasty-panel.fading {
+  opacity: 0;
+  transform: translateX(-50%) translateY(12px);
+}
+.dynasty-name {
+  font-family: var(--font-cn);
+  font-size: 26px;
+  letter-spacing: 8px;
+  color: var(--celadon-deep);
+  text-indent: 8px; /* 抵消 letter-spacing 造成的视觉偏移 */
+}
+.dynasty-time {
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: var(--gold);
+  margin-top: 2px;
+  min-height: 15px;
+}
+.dynasty-intro {
+  margin-top: 9px;
+  font-size: 13px;
+  line-height: 1.85;
+  color: var(--ink-soft);
+}
+.dynasty-progress {
+  margin-top: 9px;
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--celadon);
+}
+
+/* =====================================================================
+   5. 详情弹窗
+   ===================================================================== */
+#detail-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 1;
+  transition: opacity .32s ease;
+}
+#detail-modal.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+#detail-modal .modal-mask {
+  position: absolute;
+  inset: 0;
+  background: rgba(16, 26, 26, 0.62);
+  backdrop-filter: blur(3px);
+}
+.modal-box {
+  position: relative;
+  display: flex;
+  gap: 0;
+  width: min(880px, 82vw);
+  max-height: 78vh;
+  background: var(--porcelain);
+  border-radius: var(--radius);
+  box-shadow: 0 22px 60px rgba(12, 22, 22, 0.45);
+  border: 1px solid rgba(125, 155, 146, 0.6);
+  overflow: hidden;
+  transform: scale(1);
+  transition: transform .34s cubic-bezier(.2,.8,.3,1);
+}
+#detail-modal.hidden .modal-box { transform: scale(.94); }
+
+.modal-media {
+  flex: 0 0 44%;
+  background: #e9efec;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.modal-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.modal-body {
+  flex: 1;
+  padding: 30px 34px 26px;
+  overflow-y: auto;
+}
+.modal-tag {
+  display: inline-block;
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: var(--porcelain);
+  background: var(--celadon-deep);
+  padding: 3px 12px;
+  border-radius: 20px;
+}
+.modal-title {
+  font-family: var(--font-cn);
+  font-size: 24px;
+  letter-spacing: 3px;
+  color: var(--ink);
+  margin: 14px 0 4px;
+}
+.modal-sub {
+  font-size: 12px;
+  letter-spacing: 1.5px;
+  color: var(--gold);
+  margin-bottom: 16px;
+}
+.modal-desc {
+  font-size: 14px;
+  line-height: 2;
+  color: var(--ink-soft);
+  margin: 0 0 18px;
+  text-align: justify;
+}
+.modal-meta {
+  margin: 0;
+  padding: 14px 0 0;
+  list-style: none;
+  border-top: 1px dashed rgba(125, 155, 146, 0.5);
+}
+.modal-meta li {
+  font-size: 12.5px;
+  line-height: 1.9;
+  color: var(--ink-soft);
+  display: flex;
+}
+.modal-meta li span {
+  flex: 0 0 76px;
+  color: var(--celadon-deep);
+  letter-spacing: 1px;
+}
+
+.modal-close {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  z-index: 3;
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255,255,255,.82);
+  color: var(--celadon-deep);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background .25s, transform .25s, color .25s;
+}
+.modal-close:hover {
+  background: var(--celadon-deep);
+  color: #fff;
+  transform: rotate(90deg);
+}
+
+/* =====================================================================
+   6. 换场遮罩 / 准星 / 中央提示 / 加载页
+   ===================================================================== */
+#transition-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: #0b1212;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .5s ease;
+}
+#transition-mask.active { opacity: 1; }
+
+#crosshair {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+#crosshair .ch-dot {
+  display: block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,.85);
+  background: rgba(47, 91, 140, .5);
+  box-shadow: 0 0 6px rgba(0,0,0,.4);
+  transition: transform .2s, background .2s;
+}
+#crosshair.hot .ch-dot {
+  transform: scale(1.75);
+  background: rgba(200, 216, 210, .95);
+}
+
+#center-toast {
+  position: fixed;
+  left: 50%;
+  top: 42%;
+  transform: translate(-50%, -50%);
+  font-family: var(--font-cn);
+  font-size: 34px;
+  letter-spacing: 10px;
+  color: rgba(255, 255, 255, .92);
+  text-shadow: 0 2px 22px rgba(0,0,0,.65);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .6s ease, letter-spacing 1s ease;
+  white-space: nowrap;
+}
+#center-toast.show {
+  opacity: 1;
+  letter-spacing: 16px;
+}
+
+#loading-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: #101a1a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity .8s ease;
+}
+#loading-screen.done {
+  opacity: 0;
+  pointer-events: none;
+}
+.loading-inner { text-align: center; }
+.loading-ring {
+  width: 46px;
+  height: 46px;
+  margin: 0 auto 16px;
+  border: 2px solid rgba(200, 216, 210, .22);
+  border-top-color: var(--celadon-light);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+.loading-text {
+  font-family: var(--font-cn);
+  font-size: 14px;
+  letter-spacing: 4px;
+  color: var(--celadon-light);
+}
+
+/* =====================================================================
+   7. 动画
+   ===================================================================== */
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* =====================================================================
+   8. 小屏（电脑演示为主，这里仅做基本收敛）
+   ===================================================================== */
+@media (max-width: 1280px) {
+  #dynasty-panel { width: min(600px, 64vw); }
+}

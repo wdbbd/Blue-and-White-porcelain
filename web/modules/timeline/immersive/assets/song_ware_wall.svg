@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0.6" y2="1">
+      <stop offset="0%" stop-color="#f4f1ea"/><stop offset="100%" stop-color="#e4e0d6"/>
+    </linearGradient>
+    <linearGradient id="vase" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#dfe9e4"/><stop offset="42%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#c6d5ce"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#cfe0d8" stop-opacity="0.42"/>
+      <stop offset="100%" stop-color="#cfe0d8" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1024" height="1024" fill="url(#bg)"/>
+  <!-- 墙面装饰边框 -->
+  <g fill="none" stroke="#78868b" stroke-width="5" opacity="0.4">
+    <rect x="46" y="46" width="932" height="932" rx="6"/>
+    <rect x="66" y="66" width="892" height="892" rx="4"/>
+  </g>
+  
+  <ellipse cx="512" cy="1000" rx="330" ry="330" fill="url(#glow)"/>
+  <ellipse cx="512" cy="1300" rx="240" ry="26" fill="#8899" opacity="0.25"/>
+  <path d="M512 640 c-16 0 -28 12 -28 27 0 12 9 20 19 22
+           c-46 14 -74 58 -74 116 0 47 17 74 40 94
+           c-30 22 -47 57 -47 96 0 86 70 148 90 148
+           c20 0 90 -62 90 -148 0 -39 -17 -74 -47 -96
+           c23 -20 40 -47 40 -94 0 -58 -28 -102 -74 -116
+           c10 -2 19 -10 19 -22 0 -15 -12 -27 -28 -27 z"
+        fill="url(#vase)" stroke="#78868b" stroke-width="7"/>
+  <g fill="none" stroke="#78868b" stroke-width="7" opacity="0.85">
+    <path d="M410 910 q51 -38 102 0 q51 38 102 0"/>
+    <path d="M410 980 q51 38 102 0 q51 -38 102 0"/>
+    <path d="M430 1075 q82 -42 164 0"/>
+    <circle cx="455" cy="945" r="16"/><circle cx="569" cy="945" r="16"/>
+  </g>
+  <!-- 标题条 -->
+  <rect x="292" y="140" width="440" height="76" rx="38" fill="#78868b" opacity="0.92"/>
+  <text x="512" y="192" text-anchor="middle" font-family="serif" font-size="46"
+        fill="#fff" letter-spacing="10">宋代 · 器物</text>
+  <text x="512" y="960" text-anchor="middle" font-family="serif" font-size="38"
+        fill="#78868b" letter-spacing="8" opacity="0.8">缠枝莲纹</text>
+</svg>
